@@ -9,8 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import utils.DBUtils;
 
 /**
@@ -29,13 +27,19 @@ public class FeedbackDAO {
             if (conn != null) {
                 String sql = "INSERT INTO tblFeedbacks"
                         + "(senderEmail, title, description, sentTime, roomNumber, facilityID, statusID )"
-                        + " VALUES (?,?,?,'" + newFeedback.sentTime + "',?,?,1)";
+                        + " VALUES (?,?,?,?,?,?,1)";
                 stm = conn.prepareStatement(sql);
-                stm.setString(1, newFeedback.senderEmail);
-                stm.setString(2, newFeedback.title);
-                stm.setString(3, newFeedback.description);
-                stm.setInt(4, newFeedback.roomNumber);
-                stm.setInt(5, newFeedback.facilityID);
+                stm.setString(1, newFeedback.getSenderEmail());
+                stm.setString(2, newFeedback.getTitle());
+                stm.setString(3, newFeedback.getDescription());
+                stm.setString(4, newFeedback.getSentTime());
+                stm.setInt(5, newFeedback.getRoomNumber());
+                stm.setString(6, newFeedback.getFacilityID());
+                String x = newFeedback.getSenderEmail() + " " + newFeedback.getTitle() + " " + newFeedback.getDescription() + " "
+                        + newFeedback.getSentTime() + " "
+                        + newFeedback.getRoomNumber() + " "
+                        + newFeedback.getFacilityID() + " ";
+
                 int value = stm.executeUpdate();
                 check = value > 0 ? true : false;
             }
