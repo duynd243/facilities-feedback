@@ -11,7 +11,7 @@ package feedback;
  */
 public class FeedbackDTO {
 
-    private int feedbackID;
+    private String feedbackID;
     private String senderEmail;
     private String title;
     private String description;
@@ -24,7 +24,7 @@ public class FeedbackDTO {
     public FeedbackDTO() {
     }
 
-    public FeedbackDTO(int feedbackID, String senderEmail, String title, String description, String sentTime, String handlerEmail, int roomNumber, String facilityID, int statusID) {
+    public FeedbackDTO(String feedbackID, String senderEmail, String title, String description, String sentTime, String handlerEmail, int roomNumber, String facilityID, int statusID) {
         this.feedbackID = feedbackID;
         this.senderEmail = senderEmail;
         this.title = title;
@@ -45,11 +45,11 @@ public class FeedbackDTO {
         this.facilityID = facilityID;
     }
 
-    public int getFeedbackID() {
+    public String getFeedbackID() {
         return feedbackID;
     }
 
-    public void setFeedbackID(int feedbackID) {
+    public void setFeedbackID(String feedbackID) {
         this.feedbackID = feedbackID;
     }
 
