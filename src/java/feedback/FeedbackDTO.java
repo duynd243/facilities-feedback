@@ -11,20 +11,20 @@ package feedback;
  */
 public class FeedbackDTO {
 
-    int feedbackID;
-    String senderEmail;
-    String title;
-    String description;
-    String sentTime;
-    String handlerEmail;
-    int roomNumber;
-    int facilityID;
-    int statusID;
+    private int feedbackID;
+    private String senderEmail;
+    private String title;
+    private String description;
+    private String sentTime;
+    private String handlerEmail;
+    private int roomNumber;
+    private String facilityID;
+    private int statusID;
 
     public FeedbackDTO() {
     }
 
-    public FeedbackDTO(int feedbackID, String senderEmail, String title, String description, String sentTime, String handlerEmail, int roomNumber, int facilityID, int statusID) {
+    public FeedbackDTO(int feedbackID, String senderEmail, String title, String description, String sentTime, String handlerEmail, int roomNumber, String facilityID, int statusID) {
         this.feedbackID = feedbackID;
         this.senderEmail = senderEmail;
         this.title = title;
@@ -36,7 +36,7 @@ public class FeedbackDTO {
         this.statusID = statusID;
     }
 
-    public FeedbackDTO(String senderEmail, String title, String description, String sentTime, int roomNumber, int facilityID) {
+    public FeedbackDTO(String senderEmail, String title, String description, String sentTime, int roomNumber, String facilityID) {
         this.senderEmail = senderEmail;
         this.title = title;
         this.description = description;
@@ -69,6 +69,22 @@ public class FeedbackDTO {
         this.title = title;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSentTime() {
+        return sentTime;
+    }
+
+    public void setSentTime(String sentTime) {
+        this.sentTime = sentTime;
+    }
+
     public String getHandlerEmail() {
         return handlerEmail;
     }
@@ -85,11 +101,11 @@ public class FeedbackDTO {
         this.roomNumber = roomNumber;
     }
 
-    public int getFacilityID() {
+    public String getFacilityID() {
         return facilityID;
     }
 
-    public void setFacilityID(int facilityID) {
+    public void setFacilityID(String facilityID) {
         this.facilityID = facilityID;
     }
 
