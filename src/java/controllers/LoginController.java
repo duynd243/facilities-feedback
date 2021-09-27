@@ -21,7 +21,7 @@ import utils.GoogleUtils;
  * @author Duy
  */
 public class LoginController extends HttpServlet {
-    
+
     private static final String MANAGER_PAGE = "manager.jsp";
     private static final String EMPLOYEE_PAGE = "employee.jsp";
     private static final String USER_PAGE = "send-feedback.jsp";
@@ -40,7 +40,7 @@ public class LoginController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String id_token = request.getParameter("id_token");
         GoogleUserDTO user = GoogleUtils.getUserInfo(id_token);
-        
+
         if (user.getHd() != null && user.getHd().equals("fpt.edu.vn")) {
             GoogleUserDAO dao = new GoogleUserDAO();
             String roleID = "";
@@ -49,9 +49,12 @@ public class LoginController extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
+
             RequestDispatcher rd = null;
-            
+
+            if (!roleID.isEmpty()) {
+                user.setRoleID(roleID);
+            }
             if ("MG".equals(roleID)) {
                 rd = request.getRequestDispatcher(MANAGER_PAGE);
             } else if ("EP".equals(roleID)) {
@@ -67,7 +70,7 @@ public class LoginController extends HttpServlet {
                 }
                 rd = request.getRequestDispatcher(USER_PAGE);
             }
-            
+
             HttpSession session = request.getSession();
             session.setAttribute("LOGGED_IN_USER", user);
             rd.forward(request, response);
