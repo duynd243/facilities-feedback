@@ -3,21 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/src/java/utils/DBUtils.java</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/src/java/googleuser/GoogleUserDAO.java</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/employee.jsp</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/src/java/googleuser/GoogleUserDTO.java</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/send-feedback.jsp</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/css/style-login.css</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/login.jsp</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/logout.jsp</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/landing.html</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/src/java/googleuser/Constant.java</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/login-error.jsp</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/src/java/controllers/LogoutController.java</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/error.jsp</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/src/java/utils/GoogleUtils.java</file>
-            <file>file:/D:/FPTU/FacilitiesFeebackDemo/web/manager.jsp</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/web/send-feedback.jsp</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/googleuser/Constant.java</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/controllers/MainController.java</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/controllers/HomeController.java</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/googleuser/GoogleUserDAO.java</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/controllers/LogoutController.java</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/feedback/FeedbackDAO.java</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/web/landing.html</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/feedback/FeedbackDTO.java</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/controllers/LoginController.java</file>
+            <file>file:/C:/Users/USER/Desktop/FPTU/K5_Fall_2021/SWP391/facilities-feedback/src/java/googleuser/GoogleUserDTO.java</file>
         </group>
     </open-files>
 </project-private>
