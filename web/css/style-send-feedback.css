@@ -311,11 +311,7 @@ input[type="radio"]:checked+#radio-label .label-box {
 }
 
 .facilities {
-    margin: 0 1.875vw;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 2;
-    gap: 20px;
+    
 }
 
 #radio-label {

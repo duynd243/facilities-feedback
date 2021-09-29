@@ -5,9 +5,12 @@
  */
 package controllers;
 
+import facilities.FacilityDAO;
+import facilities.FacilityDTO;
 import googleuser.GoogleUserDAO;
 import googleuser.GoogleUserDTO;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,15 +29,6 @@ public class LoginController extends HttpServlet {
     private static final String EMPLOYEE_PAGE = "employee.jsp";
     private static final String USER_PAGE = "send-feedback.jsp";
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -42,10 +36,19 @@ public class LoginController extends HttpServlet {
         GoogleUserDTO user = GoogleUtils.getUserInfo(id_token);
 
         if (user.getHd() != null && user.getHd().equals("fpt.edu.vn")) {
-            GoogleUserDAO dao = new GoogleUserDAO();
+
+            FacilityDAO facilityDAO = new FacilityDAO();
+            ArrayList<FacilityDTO> facilitiesList = null;
+            try {
+                facilitiesList = (ArrayList<FacilityDTO>) facilityDAO.getAllFacilities();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            GoogleUserDAO userDAO = new GoogleUserDAO();
             String roleID = "";
             try {
-                roleID = dao.checkLogin(user.getEmail());
+                roleID = userDAO.checkLogin(user.getEmail());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -64,7 +67,7 @@ public class LoginController extends HttpServlet {
             } else if (roleID.isEmpty()) {
                 try {
                     user.setRoleID("US");
-                    dao.addNewUser(user);
+                    userDAO.addNewUser(user);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -73,6 +76,7 @@ public class LoginController extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("LOGGED_IN_USER", user);
+            session.setAttribute("FACILITIES_LIST", facilitiesList);
             rd.forward(request, response);
         } else {
             request.setAttribute("ERROR", "email");

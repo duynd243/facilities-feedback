@@ -4,11 +4,15 @@
     Author     : Duy
 --%>
 
+<%@page import="java.util.ArrayList"%>
+<%@page import="facilities.FacilityDTO"%>
 <%@page import="googleuser.GoogleUserDTO"%>
 <%@page import="googleuser.Constant"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <% GoogleUserDTO loggedInUser = (GoogleUserDTO) session.getAttribute("LOGGED_IN_USER"); %>
+<% ArrayList<FacilityDTO> facilitiesList = (ArrayList<FacilityDTO>)session.getAttribute("FACILITIES_LIST");%>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -163,40 +167,36 @@
             </div>
             <div class="content">
                 <div class="sbcontent" id="new-feedback">
-                    <form action="Controller">
+                    <form action="MainController" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="senderEmail" value="<%=loggedInUser.getEmail()%>">
                         <div class="ilabel">Title</div>
                         <div style="display: flex;">
-                            <input type="text" name="title" class="title" placeholder="Enter your title here..." required>
+                            <input type="text" name="title" class="title"maxlength="150" placeholder="Enter your title here..." required>
                         </div>
 
                         <div class="ilabel">Desciption</div>
                         <div style="display: flex; justify-content: center;">
-                            <textarea name="desciption" maxlength="5000" placeholder="Tell us detail problem..."
+                            <textarea name="desciption" maxlength="4000" placeholder="Tell us detail problem..."
                                       required></textarea>
                         </div>
                         <span id="chars-remain"></span>
 
                         <div class="ilabel" style="margin-top: 30px;">Choose facility</div>
 
-                        <div class="facilities">
-                            <input type="radio" id="facility1" name="facilityID" class="facilityID" value="HTML" required>
-                            <label style="grid-column: 1;" id="radio-label" for="facility1">
-                                <div class="label-box">Điện</div>
+                        <div class="facilities" style ="margin: 0 1.875vw;display: grid;grid-template-columns: repeat(<%=facilitiesList.size()%>, 1fr);grid-template-rows: 1;gap: 20px;">
+                            <% int i = 0; %>
+                            <% for(FacilityDTO f: facilitiesList) { i++; %>
+                            <input type="radio" id="facility<%=i%>" name="facilityID" class="facilityID" value="<%=f.getFacilityID()%>" required>
+                            <label style="grid-column: <%=i%>;" id="radio-label" for="facility<%=i%>">
+                                <div class="label-box"><%=f.getFacilityName()%></div>
                             </label>
-                            <input type="radio" id="facility2" name="facilityID" class="facilityID" value="CSS">
-                            <label style="grid-column: 2;" id="radio-label" for="facility2">
-                                <div class="label-box">Thiết bị dạy học</div>
-                            </label>
-                            <input type="radio" id="facility3" name="facilityID" class="facilityID" value="JavaScript">
-                            <label style="grid-column: 3;" id="radio-label" for="facility3">
-                                <div class="label-box">Bàn ghế</div>
-                            </label>
+                            <%}%>
                         </div>
 
                         <div style="display: flex;">
                             <div style="width: 50%;">
                                 <div class="ilabel">Location</div>
-                                <input type="number" name="" id="" placeholder="Enter room number..." required>
+                                <input type="number" name="roomNumber" min="1" max="50" placeholder="Enter room number..." required>
                             </div>
 
                             <div style="width: 50%;">
@@ -224,7 +224,7 @@
                                 </script>
                             </div>
                         </div>
-                        <button type="submit" class="send">
+                        <button type="submit" class="send" name="action" value="Send">
                             <i class="material-icons" id="send-icon" style="margin-right: 10px;">send</i>
                             <div>
                                 Send feedback

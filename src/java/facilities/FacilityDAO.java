@@ -122,4 +122,35 @@ public class FacilityDAO {
         }
         return update;
     }
+
+    public List<FacilityDTO> getAllFacilities() throws SQLException {
+        List<FacilityDTO> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = DBUtils.getConnection();
+            String sql = "SELECT * FROM tblFacilities";
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String facilityID = rs.getString("facilityID");
+                String facilityName = rs.getString("facilityName");
+                list.add(new FacilityDTO(facilityID, facilityName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return list;
+    }
 }

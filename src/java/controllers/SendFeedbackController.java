@@ -5,42 +5,53 @@
  */
 package controllers;
 
+import feedback.FeedbackDAO;
+import feedback.FeedbackDTO;
 import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
+import utils.TimeUtils;
 
 /**
  *
  * @author Duy
  */
-public class MainController extends HttpServlet {
+@MultipartConfig
 
-    private static final String ERROR = "error.jsp";
-    private static final String LOGOUT = "LogoutController";
-    private static final String SEND_FEEDBAK = "SendFeedbackController";
+public class SendFeedbackController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        String url = ERROR;
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+        String sentTime = TimeUtils.currentTimeString();
+        String senderEmail = request.getParameter("senderEmail");
+        String title = request.getParameter("title");
+        String description = request.getParameter("desciption");
+        int roomNumber = Integer.parseInt(request.getParameter("roomNumber"));
+        String facilityID = request.getParameter("facilityID");
+        
+        Part part = request.getPart("images");
+        String path = getServletContext().getRealPath("/images");
+        String fileName = part.getSubmittedFileName();
+
+        FeedbackDTO newFeedback = new FeedbackDTO(senderEmail, title, description, sentTime, roomNumber, facilityID);
+        FeedbackDAO feedbackDAO = new FeedbackDAO();
+
+        String feebbackID = "";
         try {
-            String action = request.getParameter("action");
-            if ("Log out".equals(action)) {
-                url = LOGOUT;
-            } else if ("Send".equals(action)) {
-                url = SEND_FEEDBAK;
-            } else {
-                HttpSession session = request.getSession();
-                session.setAttribute("ERROR_MESSAGE", "Function is not avaiable");
-            }
+            feebbackID = feedbackDAO.addFeedback(newFeedback);
         } catch (Exception e) {
-            log("Error at MainController:" + e.toString());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            e.printStackTrace();
         }
+        
+        
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

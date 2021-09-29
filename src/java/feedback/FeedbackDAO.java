@@ -20,36 +20,40 @@ import utils.DBUtils;
  */
 public class FeedbackDAO {
 
-    public static boolean addFeedback(FeedbackDTO newFeedback) throws SQLException {
+    public String addFeedback(FeedbackDTO newFeedback) throws SQLException {
         boolean check = false;
         Connection conn = null;
         PreparedStatement stm = null;
         ResultSet rs = null;
+        String newFeedbackID = "";
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                String sender = newFeedback.getSenderEmail();
-                String sql = "SELECT COUNT(*) as sumSendersFeedback "
-                        + "FROM tblFeedbacks "
-                        + "WHERE senderEmail = ?";
-                stm = conn.prepareStatement(sql);
-                stm.setString(1, sender);
-                rs = stm.executeQuery();
-                rs.next();
-                String[] part = sender.split("@");
-                String newFeedbackID = String.format(part[0] + ".%03d", rs.getInt("sumSendersFeedback") + 1);
-                sql = "INSERT INTO tblFeedbacks"
-                        + "(feedbackID, senderEmail, title, description, sentTime, roomNumber, facilityID, statusID )"
-                        + " VALUES (?,?,?,?,?,?,?,1)";
-                stm = conn.prepareStatement(sql);
-                stm.setString(1, newFeedbackID);
-                stm.setString(2, newFeedback.getSenderEmail());
-                stm.setString(3, newFeedback.getTitle());
-                stm.setString(4, newFeedback.getDescription());
-                stm.setString(5, newFeedback.getSentTime());
-                stm.setInt(6, newFeedback.getRoomNumber());
-                stm.setString(7, newFeedback.getFacilityID());
-                check = stm.executeUpdate() > 0 ? true : false;
+                while (!check) {
+                    String sender = newFeedback.getSenderEmail();
+                    String sql = "SELECT COUNT(*) as sumSendersFeedback "
+                            + "FROM tblFeedbacks "
+                            + "WHERE senderEmail = ?";
+                    stm = conn.prepareStatement(sql);
+                    stm.setString(1, sender);
+                    rs = stm.executeQuery();
+                    rs.next();
+                    String[] part = sender.split("@");
+                    newFeedbackID = String.format(part[0] + ".%03d", rs.getInt("sumSendersFeedback") + 1);
+                    sql = "INSERT INTO tblFeedbacks"
+                            + "(feedbackID, senderEmail, title, description, sentTime, roomNumber, facilityID, statusID )"
+                            + " VALUES (?,?,?,?,?,?,?,1)";
+                    stm = conn.prepareStatement(sql);
+                    stm.setString(1, newFeedbackID);
+                    stm.setString(2, newFeedback.getSenderEmail());
+                    stm.setString(3, newFeedback.getTitle());
+                    stm.setString(4, newFeedback.getDescription());
+                    stm.setString(5, newFeedback.getSentTime());
+                    stm.setInt(6, newFeedback.getRoomNumber());
+                    stm.setString(7, newFeedback.getFacilityID());
+                    check = stm.executeUpdate() > 0 ? true : false;
+                }
+
             }
         } catch (Exception e) {
         } finally {
@@ -63,7 +67,7 @@ public class FeedbackDAO {
                 conn.close();
             }
         }
-        return check;
+        return newFeedbackID;
     }
 
     public static List<FeedbackDTO> getListFeedback(GoogleUserDTO loggedUser, int searchStatusID) throws SQLException {
