@@ -7,7 +7,11 @@ package controllers;
 
 import feedback.FeedbackDAO;
 import feedback.FeedbackDTO;
+import image.ImageDAO;
+import image.ImageDTO;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
@@ -21,7 +25,6 @@ import utils.TimeUtils;
  * @author Duy
  */
 @MultipartConfig
-
 public class SendFeedbackController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -35,22 +38,34 @@ public class SendFeedbackController extends HttpServlet {
         String description = request.getParameter("desciption");
         int roomNumber = Integer.parseInt(request.getParameter("roomNumber"));
         String facilityID = request.getParameter("facilityID");
-        
-        Part part = request.getPart("images");
-        String path = getServletContext().getRealPath("/images");
-        String fileName = part.getSubmittedFileName();
 
         FeedbackDTO newFeedback = new FeedbackDTO(senderEmail, title, description, sentTime, roomNumber, facilityID);
         FeedbackDAO feedbackDAO = new FeedbackDAO();
+        ImageDAO imageDAO = new ImageDAO();
 
-        String feebbackID = "";
+        String feedbackID = "";
         try {
-            feebbackID = feedbackDAO.addFeedback(newFeedback);
+            feedbackID = feedbackDAO.addFeedback(newFeedback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Part part = request.getPart("images");
+        String path = getServletContext().getRealPath("/images");
+        String fileName = part.getSubmittedFileName();
+        if (!Files.exists(Path.of(path))) {
+            Files.createDirectory(Path.of(path));
+        }
+        part.write(path + "/" + fileName);
+
+        ImageDTO image = new ImageDTO("images/" + fileName, feedbackID);
+        try {
+            imageDAO.insertFeedbackImages(image);
         } catch (Exception e) {
             e.printStackTrace();
         }
         
-        
+        request.getRequestDispatcher("HomeController").forward(request, response);
 
     }
 

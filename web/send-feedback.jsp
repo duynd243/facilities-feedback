@@ -4,6 +4,11 @@
     Author     : Duy
 --%>
 
+<%@page import="image.ImageDAO"%>
+<%@page import="image.ImageDTO"%>
+<%@page import="utils.TimeUtils"%>
+<%@page import="feedback.FeedbackDTO"%>
+<%@page import="feedback.FeedbackDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="facilities.FacilityDTO"%>
 <%@page import="googleuser.GoogleUserDTO"%>
@@ -11,7 +16,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <% GoogleUserDTO loggedInUser = (GoogleUserDTO) session.getAttribute("LOGGED_IN_USER"); %>
-<% ArrayList<FacilityDTO> facilitiesList = (ArrayList<FacilityDTO>)session.getAttribute("FACILITIES_LIST");%>
+<% ArrayList<FacilityDTO> facilitiesList = (ArrayList<FacilityDTO>) session.getAttribute("FACILITIES_LIST");%>
+<% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 1); %>
+<% ArrayList<FeedbackDTO> feedbackList2 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 2); %>
+<% ArrayList<FeedbackDTO> feedbackList3 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 3);%>
 
 <!DOCTYPE html>
 <html>
@@ -51,7 +59,7 @@
     <body>
 
         <div style="display: none" class="g-signin2" data-onsuccess="onSignIn" data-prompt="select_account"></div>
-        
+
         <header>
             <div class="header-left">
                 <img class="fptlogo" src="images/fpt.png">
@@ -185,7 +193,8 @@
 
                         <div class="facilities" style ="margin: 0 1.875vw;display: grid;grid-template-columns: repeat(<%=facilitiesList.size()%>, 1fr);grid-template-rows: 1;gap: 20px;">
                             <% int i = 0; %>
-                            <% for(FacilityDTO f: facilitiesList) { i++; %>
+                            <% for (FacilityDTO f : facilitiesList) {
+                                    i++;%>
                             <input type="radio" id="facility<%=i%>" name="facilityID" class="facilityID" value="<%=f.getFacilityID()%>" required>
                             <label style="grid-column: <%=i%>;" id="radio-label" for="facility<%=i%>">
                                 <div class="label-box"><%=f.getFacilityName()%></div>
@@ -240,55 +249,52 @@
                                 onclick="selectFeedbackCategory(id, 'pending-content')">
                             <ion-icon name="hourglass-outline"></ion-icon>
                             Pending
-                            <div class="badge-num">10</div>
+                            <div class="badge-num"><%=feedbackList1.size()%></div>
                         </button>
                         <button id="f2" class="feedback-category"
                                 onclick="selectFeedbackCategory(id, 'processing-content')">
-                            <ion-icon name="hammer-outline"></ion-icon>Processing <div class="badge-num">2</div>
+                            <ion-icon name="hammer-outline"></ion-icon>Processing <div class="badge-num"><%=feedbackList2.size()%></div>
                         </button>
                         <button id="f3" class="feedback-category" onclick="selectFeedbackCategory(id, 'completed-content')">
                             <ion-icon name="checkmark-done-outline"></ion-icon>Completed
-                            <div class="badge-num">2</div>
+                            <div class="badge-num"><%=feedbackList3.size()%></div>
                         </button>
                     </div>
 
                     <div class="feedback-category-content" id="pending-content">
-
-                        <div class="pending-item feedback-item" onclick="openFeedback('it1', this.className)">
+                        <% if (feedbackList1.size() > 0) { %>
+                        <% for (FeedbackDTO f : feedbackList1) {%>
+                        <div class="pending-item feedback-item" onclick="openFeedback(<%=f.getFacilityID()%>, this.className)">
                             <div class="item-left">
                                 <img class="feedback-profilepic-list"
-                                     src="https://lh3.googleusercontent.com/a-/AOh14GgdqYd6L14mXAnvwSaPGdBxUkV55V3B5KwsWDx2Og=s96-c">
+                                     src="<%=loggedInUser.getPicture()%>">
                                 <div class="title-description">
-                                    <div class="feedback-title-list">Tiêu đề feedback</div>
-                                    <div class="feedback-description-list">
-                                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid, officia voluptates veniam rem repudiandae optio quam?
-                                        Temporibus qui ea a amet corporis consequatur? Eos tempore recusandae cum
-                                        voluptatibus tenetur natus?</div>
+                                    <div class="feedback-title-list"><%=f.getTitle()%></div>
+                                    <div class="feedback-description-list"><%=f.getDescription()%></div>
                                 </div>
                             </div>
                             <div class="item-right">
                                 <div class="location-time">
                                     <div class="feedback-location-list">
-                                        <ion-icon name="location"></ion-icon>Room 21
+                                        <ion-icon name="location"></ion-icon>Room <%=f.getRoomNumber()%>
                                     </div>
-                                    <div class="feedback-senttime-list">14:09:12 | 29-09-2021</div>
+                                    <div class="feedback-senttime-list"><%=TimeUtils.renderedTime(f.getSentTime())%></div>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="it1" class="feeback-post" style="display: none;">
-                            <div onclick="wayBack('it1', 'pending-item')" class="fbp-back">
+                        <div id="<%=f.getFacilityID()%>" class="feeback-post" style="display: none;">
+                            <div onclick="wayBack('<%=f.getFacilityID()%>', 'pending-item')" class="fbp-back">
                                 <i class="material-icons-outlined">chevron_left</i>
                                 Back
                             </div>
-                            <h1 class="fbp-title">Tiêu đề feedback này rất là dài và nó sẽ cần đến hai dòng để hiển thị đấy
-                                các mẹ ạ</h1>
+                            <h1 class="fbp-title"><%=f.getTitle()%></h1>
 
                             <div class="fbp-aftertitle">
                                 <div class="sender-time">
                                     <img class="fbp-profilepic"
-                                         src="https://lh3.googleusercontent.com/a/AATXAJxPxz0xf1QV3YjGMZIava1b17obCvA-MTsxBRLj=s96-c">
-                                    <div>Sent by You (duyndse150396@fpt.edu.vn)</br>at 14:09 | 29-09-2021</div>
+                                         src="<%=loggedInUser.getPicture()%>">
+                                    <div>Sent by You (<%=loggedInUser.getEmail()%>)</br>at <%=TimeUtils.renderedTime(f.getSentTime())%></div>
                                 </div>
                                 <div class="facility-location">
                                     <div class="fbp-facility" style="display: flex; align-items: center;">
@@ -300,7 +306,7 @@
                                     <div class="fbp-location" style="display: flex; align-items: center;">
                                         <i class="material-icons">house</i>
                                         <div>
-                                            <b>Location</b><br>Room 21
+                                            <b>Location</b><br>Room <%=f.getRoomNumber()%>
                                         </div>
                                     </div>
 
@@ -308,81 +314,21 @@
                             </div>
 
                             <hr style="height:1.5px; border:none; background-color:#ddd; margin-bottom: 20px;">
+                            <%String imageURL = ImageDAO.loadImageByFeedbackID(f.getFacilityID()).getImageURL();%>
                             <img class="fbp-image"
-                                 src="https://hcmuni.fpt.edu.vn/Data/Sites/1/media/2020-kim-vi/seo/campus/1-truong-dai-hoc-fpt-tphcm/truong-dai-hoc-fpt-tp-hcm-(1).jpg"
+                                 src="<%=imageURL%>"
                                  alt="">
-                            <p class="fbp-description">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ex dolorem
-                                facilis voluptas ad quisquam explicabo omnis dolores deleniti quae illo soluta voluptatum
-                                error blanditiis doloribus dolorum incidunt recusandae aut id quidem nisi magnam, minus
-                                reiciendis? Eaque quibusdam odio facilis quis placeat quia possimus commodi doloremque.
-                                Voluptatum, optio blanditiis amet vitae libero voluptatibus nemo eius id assumenda facilis
-                                quibusdam tenetur dolorum incidunt quisquam similique sint illum, quidem inventore? Quam
-                                tempore voluptatum necessitatibus eaque. Quidem delectus, facere accusamus quam optio porro
-                                nihil pariatur cupiditate! Explicabo fugit quod doloremque nesciunt odio fuga temporibus
-                                magnam autem accusantium aut, enim officia, amet officiis illum reprehenderit?</p>
+                            <p class="fbp-description"><%=f.getDescription()%></p>
                         </div>
-
-
-
-                        <div class="pending-item feedback-item" onclick="openFeedback('it2', this.className)">
-                            <div class="item-left">
-                                <img class="feedback-profilepic-list"
-                                     src="https://lh3.googleusercontent.com/a-/AOh14GgdqYd6L14mXAnvwSaPGdBxUkV55V3B5KwsWDx2Og=s96-c">
-                                <div class="title-description">
-                                    <div class="feedback-title-list">Tiêu đề feedback</div>
-                                    <div class="feedback-description-list">Lorem, ipsum dolor sit amet consectetur
-                                        adipisicing elit. Aliquid, officia voluptates veniam rem repudiandae optio quam?
-                                        Temporibus qui ea a amet corporis consequatur? Eos tempore recusandae cum
-                                        voluptatibus tenetur natus?</div>
-                                </div>
-                            </div>
-                            <div class="item-right">
-                                <div class="location-time">
-                                    <div class="feedback-location-list">
-                                        <ion-icon name="location"></ion-icon>Room 21
-                                    </div>
-                                    <div class="feedback-senttime-list">14:09:12 | 29-09-2021</div>
-                                </div>
-                            </div>
+                        <% } %> 
+                        <% } else { %>
+                        <div class="empty-feedback"
+                             style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
+                            <i style="font-size: 200px; color: #ddd;" class="material-icons">inbox</i>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 40px;color: rgb(100, 95, 95);">
+                                There are no feedbacks for this section.</p>
                         </div>
-
-                        <div class="pending-item feedback-item" onclick="openFeedback('it3', this.className)">
-                            <div class="item-left">
-                                <img class="feedback-profilepic-list"
-                                     src="https://lh3.googleusercontent.com/a-/AOh14GgdqYd6L14mXAnvwSaPGdBxUkV55V3B5KwsWDx2Og=s96-c">
-                                <div class="title-description">
-                                    <div class="feedback-title-list">Tiêu đề feedback</div>
-                                    <div class="feedback-description-list">Lorem, ipsum dolor sit amet consectetur
-                                        adipisicing elit. Aliquid, officia voluptates veniam rem repudiandae optio quam?
-                                        Temporibus qui ea a amet corporis consequatur? Eos tempore recusandae cum
-                                        voluptatibus tenetur natus?</div>
-                                </div>
-                            </div>
-                            <div class="item-right">
-                                <div class="location-time">
-                                    <div class="feedback-location-list">
-                                        <ion-icon name="location"></ion-icon>Room 21
-                                    </div>
-                                    <div class="feedback-senttime-list">14:09:12 | 29-09-2021</div>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                        <div id="it2" style="display: none;">
-                            <button onclick="wayBack('it2', 'pending-item')">Back</button>
-                            <p>IT2</p>
-                        </div>
-
-                        <div id="it3" style="display: none;">
-                            <button onclick="wayBack('it3', 'pending-item')">Back</button>
-                            <p>IT3</p>
-                        </div>
-
-
-
-
+                        <%}%>
                     </div>
 
                     <script>
@@ -410,15 +356,144 @@
                         }
                     </script>
                     <div class="feedback-category-content" id="processing-content" style="display: none;">
+                        <% if (feedbackList2.size() > 0) { %>
+                        <% for (FeedbackDTO f : feedbackList2) {%>
+                        <div class="pending-item feedback-item" onclick="openFeedback(<%=f.getFacilityID()%>, this.className)">
+                            <div class="item-left">
+                                <img class="feedback-profilepic-list"
+                                     src="<%=loggedInUser.getPicture()%>">
+                                <div class="title-description">
+                                    <div class="feedback-title-list"><%=f.getTitle()%></div>
+                                    <div class="feedback-description-list"><%=f.getDescription()%></div>
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="location-time">
+                                    <div class="feedback-location-list">
+                                        <ion-icon name="location"></ion-icon>Room <%=f.getRoomNumber()%>
+                                    </div>
+                                    <div class="feedback-senttime-list"><%=TimeUtils.renderedTime(f.getSentTime())%></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="<%=f.getFacilityID()%>" class="feeback-post" style="display: none;">
+                            <div onclick="wayBack('<%=f.getFacilityID()%>', 'pending-item')" class="fbp-back">
+                                <i class="material-icons-outlined">chevron_left</i>
+                                Back
+                            </div>
+                            <h1 class="fbp-title"><%=f.getTitle()%></h1>
+
+                            <div class="fbp-aftertitle">
+                                <div class="sender-time">
+                                    <img class="fbp-profilepic"
+                                         src="<%=loggedInUser.getPicture()%>">
+                                    <div>Sent by You (<%=loggedInUser.getEmail()%>)</br>at <%=TimeUtils.renderedTime(f.getSentTime())%></div>
+                                </div>
+                                <div class="facility-location">
+                                    <div class="fbp-facility" style="display: flex; align-items: center;">
+                                        <i class="material-icons">widgets</i>
+                                        <div>
+                                            <b>Facility</b><br>Electricity
+                                        </div>
+                                    </div>
+                                    <div class="fbp-location" style="display: flex; align-items: center;">
+                                        <i class="material-icons">house</i>
+                                        <div>
+                                            <b>Location</b><br>Room <%=f.getRoomNumber()%>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <hr style="height:1.5px; border:none; background-color:#ddd; margin-bottom: 20px;">
+                            <%String imageURL = ImageDAO.loadImageByFeedbackID(f.getFacilityID()).getImageURL();%>
+                            <img class="fbp-image"
+                                 src="<%=imageURL%>"
+                                 alt="">
+                            <p class="fbp-description"><%=f.getDescription()%></p>
+                        </div>
+                        <% } %> 
+                        <% } else { %>
                         <div class="empty-feedback"
                              style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
                             <i style="font-size: 200px; color: #ddd;" class="material-icons">inbox</i>
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 40px;color: rgb(100, 95, 95);">
                                 There are no feedbacks for this section.</p>
-
                         </div>
+                        <%}%>
                     </div>
-                    <div class="feedback-category-content" id="completed-content" style="display: none;"></div>
+                    <div class="feedback-category-content" id="completed-content" style="display: none;">
+                        <% if (feedbackList3.size() > 0) { %>
+                        <% for (FeedbackDTO f : feedbackList3) {%>
+                        <div class="pending-item feedback-item" onclick="openFeedback(<%=f.getFacilityID()%>, this.className)">
+                            <div class="item-left">
+                                <img class="feedback-profilepic-list"
+                                     src="<%=loggedInUser.getPicture()%>">
+                                <div class="title-description">
+                                    <div class="feedback-title-list"><%=f.getTitle()%></div>
+                                    <div class="feedback-description-list"><%=f.getDescription()%></div>
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="location-time">
+                                    <div class="feedback-location-list">
+                                        <ion-icon name="location"></ion-icon>Room <%=f.getRoomNumber()%>
+                                    </div>
+                                    <div class="feedback-senttime-list"><%=TimeUtils.renderedTime(f.getSentTime())%></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="<%=f.getFacilityID()%>" class="feeback-post" style="display: none;">
+                            <div onclick="wayBack('<%=f.getFacilityID()%>', 'pending-item')" class="fbp-back">
+                                <i class="material-icons-outlined">chevron_left</i>
+                                Back
+                            </div>
+                            <h1 class="fbp-title"><%=f.getTitle()%></h1>
+
+                            <div class="fbp-aftertitle">
+                                <div class="sender-time">
+                                    <img class="fbp-profilepic"
+                                         src="<%=loggedInUser.getPicture()%>">
+                                    <div>Sent by You (<%=loggedInUser.getEmail()%>)</br>at <%=TimeUtils.renderedTime(f.getSentTime())%></div>
+                                </div>
+                                <div class="facility-location">
+                                    <div class="fbp-facility" style="display: flex; align-items: center;">
+                                        <i class="material-icons">widgets</i>
+                                        <div>
+                                            <b>Facility</b><br>Electricity
+                                        </div>
+                                    </div>
+                                    <div class="fbp-location" style="display: flex; align-items: center;">
+                                        <i class="material-icons">house</i>
+                                        <div>
+                                            <b>Location</b><br>Room <%=f.getRoomNumber()%>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <hr style="height:1.5px; border:none; background-color:#ddd; margin-bottom: 20px;">
+                            <%String imageURL = ImageDAO.loadImageByFeedbackID(f.getFacilityID()).getImageURL();%>
+                            <img class="fbp-image"
+                                 src="<%=imageURL%>"
+                                 alt="">
+                            <p class="fbp-description"><%=f.getDescription()%></p>
+                        </div>
+                        <% } %> 
+                        <% } else { %>
+                        <div class="empty-feedback"
+                             style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
+                            <i style="font-size: 200px; color: #ddd;" class="material-icons">inbox</i>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 40px;color: rgb(100, 95, 95);">
+                                There are no feedbacks for this section.</p>
+                        </div>
+                        <%}%>
+
+                    </div>
                 </div>
             </div>
 

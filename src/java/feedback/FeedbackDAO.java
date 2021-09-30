@@ -84,8 +84,10 @@ public class FeedbackDAO {
                 if (roleID.equals("US")) {
                     sql = "SELECT * "
                             + "FROM tblFeedbacks "
-                            + "WHERE senderEmail = '" + email + "'";
+                            + "WHERE senderEmail = ? AND statusID = ? ";
                     stm = conn.prepareStatement(sql);
+                    stm.setString(1, email);
+                    stm.setInt(2, searchStatusID);
                 } else if (roleID.equals("MG")) {
                     sql = "SELECT * "
                             + "FROM tblFeedbacks"

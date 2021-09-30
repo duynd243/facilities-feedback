@@ -19,5 +19,9 @@ public class TimeUtils {
         LocalDateTime now = LocalDateTime.now();
         return dtf.format(now);
     }
+    
+    public static String renderedTime(String time) {
+       return time;
+    }
 
 }
