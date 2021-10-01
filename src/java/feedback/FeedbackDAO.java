@@ -23,7 +23,7 @@ public class FeedbackDAO {
     public String addFeedback(FeedbackDTO newFeedback) throws SQLException {
         boolean check = false;
         Connection conn = null;
-        PreparedStatement stm = null;
+        PreparedStatement ps = null;
         ResultSet rs = null;
         String newFeedbackID = "";
         try {
@@ -34,24 +34,24 @@ public class FeedbackDAO {
                     String sql = "SELECT COUNT(*) as sumSendersFeedback "
                             + "FROM tblFeedbacks "
                             + "WHERE senderEmail = ?";
-                    stm = conn.prepareStatement(sql);
-                    stm.setString(1, sender);
-                    rs = stm.executeQuery();
+                    ps = conn.prepareStatement(sql);
+                    ps.setString(1, sender);
+                    rs = ps.executeQuery();
                     rs.next();
                     String[] part = sender.split("@");
                     newFeedbackID = String.format(part[0] + ".%03d", rs.getInt("sumSendersFeedback") + 1);
                     sql = "INSERT INTO tblFeedbacks"
                             + "(feedbackID, senderEmail, title, description, sentTime, roomNumber, facilityID, statusID )"
                             + " VALUES (?,?,?,?,?,?,?,1)";
-                    stm = conn.prepareStatement(sql);
-                    stm.setString(1, newFeedbackID);
-                    stm.setString(2, newFeedback.getSenderEmail());
-                    stm.setString(3, newFeedback.getTitle());
-                    stm.setString(4, newFeedback.getDescription());
-                    stm.setString(5, newFeedback.getSentTime());
-                    stm.setInt(6, newFeedback.getRoomNumber());
-                    stm.setString(7, newFeedback.getFacilityID());
-                    check = stm.executeUpdate() > 0 ? true : false;
+                    ps = conn.prepareStatement(sql);
+                    ps.setString(1, newFeedbackID);
+                    ps.setString(2, newFeedback.getSenderEmail());
+                    ps.setString(3, newFeedback.getTitle());
+                    ps.setString(4, newFeedback.getDescription());
+                    ps.setString(5, newFeedback.getSentTime());
+                    ps.setInt(6, newFeedback.getRoomNumber());
+                    ps.setString(7, newFeedback.getFacilityID());
+                    check = ps.executeUpdate() > 0 ? true : false;
                 }
 
             }
@@ -60,8 +60,8 @@ public class FeedbackDAO {
             if (rs != null) {
                 rs.close();
             }
-            if (stm != null) {
-                stm.close();
+            if (ps != null) {
+                ps.close();
             }
             if (conn != null) {
                 conn.close();
@@ -73,7 +73,7 @@ public class FeedbackDAO {
     public static List<FeedbackDTO> getListFeedback(GoogleUserDTO loggedUser, int searchStatusID) throws SQLException {
         List<FeedbackDTO> list = new ArrayList<>();
         Connection conn = null;
-        PreparedStatement stm = null;
+        PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             conn = DBUtils.getConnection();
@@ -82,25 +82,23 @@ public class FeedbackDAO {
                 String email = loggedUser.getEmail();
                 String sql = "";
                 if (roleID.equals("US")) {
-                    sql = "SELECT * "
-                            + "FROM tblFeedbacks "
-                            + "WHERE senderEmail = ? AND statusID = ? ";
-                    stm = conn.prepareStatement(sql);
-                    stm.setString(1, email);
-                    stm.setInt(2, searchStatusID);
+                    sql = "SELECT * FROM tblFeedbacks WHERE senderEmail = ? AND statusID = ? ORDER BY sentTime desc";
+                    ps = conn.prepareStatement(sql);
+                    ps.setString(1, email);
+                    ps.setInt(2, searchStatusID);
                 } else if (roleID.equals("MG")) {
                     sql = "SELECT * "
                             + "FROM tblFeedbacks"
                             + "WHERE handlerEmail like ?";
-                    stm = conn.prepareStatement(sql);
-                    stm.setString(1, "%" + email + "%");
+                    ps = conn.prepareStatement(sql);
+                    ps.setString(1, "%" + email + "%");
                 } else {
                     sql = "SELECT * "
                             + "FROM tblFeedbacks "
                             + "WHERE statusID = " + searchStatusID;
-                    stm = conn.prepareStatement(sql);
+                    ps = conn.prepareStatement(sql);
                 }
-                rs = stm.executeQuery();
+                rs = ps.executeQuery();
                 while (rs.next()) {
                     String feedbackID = rs.getString("feedbackID");
                     String title = rs.getString("title");
@@ -119,8 +117,8 @@ public class FeedbackDAO {
             if (rs != null) {
                 rs.close();
             }
-            if (stm != null) {
-                stm.close();
+            if (ps != null) {
+                ps.close();
             }
             if (conn != null) {
                 conn.close();

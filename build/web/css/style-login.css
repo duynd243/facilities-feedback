@@ -132,7 +132,9 @@ main{
     border-radius: 15px;
 }
 
-
+.goback:hover{
+    opacity: 0.96;
+}
 
 
 footer{

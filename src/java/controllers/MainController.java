@@ -17,7 +17,6 @@ import javax.servlet.http.HttpSession;
  *
  * @author Duy
  */
-
 @MultipartConfig
 public class MainController extends HttpServlet {
 
@@ -27,7 +26,9 @@ public class MainController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
         String url = ERROR;
         try {
             String action = request.getParameter("action");

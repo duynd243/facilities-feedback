@@ -7,9 +7,12 @@ package controllers;
 
 import facilities.FacilityDAO;
 import facilities.FacilityDTO;
+import feedback.FeedbackDAO;
+import feedback.FeedbackDTO;
 import googleuser.GoogleUserDAO;
 import googleuser.GoogleUserDTO;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -36,14 +39,6 @@ public class LoginController extends HttpServlet {
         GoogleUserDTO user = GoogleUtils.getUserInfo(id_token);
 
         if (user.getHd() != null && user.getHd().equals("fpt.edu.vn")) {
-
-            FacilityDAO facilityDAO = new FacilityDAO();
-            ArrayList<FacilityDTO> facilitiesList = null;
-            try {
-                facilitiesList = (ArrayList<FacilityDTO>) facilityDAO.getAllFacilities();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
             GoogleUserDAO userDAO = new GoogleUserDAO();
             String roleID = "";
@@ -76,7 +71,6 @@ public class LoginController extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("LOGGED_IN_USER", user);
-            session.setAttribute("FACILITIES_LIST", facilitiesList);
             rd.forward(request, response);
         } else {
             request.setAttribute("ERROR", "email");
@@ -111,6 +105,36 @@ public class LoginController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        /*
+        PrintWriter out = response.getWriter();
+
+        String id_token = request.getParameter("id_token");
+        GoogleUserDTO user = GoogleUtils.getUserInfo(id_token);
+        user.setRoleID("US");
+
+        ArrayList<FeedbackDTO> feedbackList1 = null;
+        ArrayList<FeedbackDTO> feedbackList2 = null;
+        ArrayList<FeedbackDTO> feedbackList3 = null;
+
+        try {
+            feedbackList1 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(user, 1);
+            feedbackList2 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(user, 2);
+            feedbackList3 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(user, 3);
+
+        } catch (Exception e) {
+        }
+        for (FeedbackDTO f : feedbackList1) {
+            out.println(f.toString());
+        }
+
+        for (FeedbackDTO f : feedbackList2) {
+            out.println(f.toString());
+        }
+
+        for (FeedbackDTO f : feedbackList3) {
+            out.println(f.toString());
+        }
+         */
     }
 
     /**

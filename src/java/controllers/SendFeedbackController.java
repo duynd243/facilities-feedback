@@ -11,7 +11,7 @@ import image.ImageDAO;
 import image.ImageDTO;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
@@ -53,8 +53,8 @@ public class SendFeedbackController extends HttpServlet {
         Part part = request.getPart("images");
         String path = getServletContext().getRealPath("/images");
         String fileName = part.getSubmittedFileName();
-        if (!Files.exists(Path.of(path))) {
-            Files.createDirectory(Path.of(path));
+        if (!Files.exists(Paths.get(path))) {
+            Files.createDirectory(Paths.get(path));
         }
         part.write(path + "/" + fileName);
 
@@ -64,8 +64,8 @@ public class SendFeedbackController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        request.getRequestDispatcher("HomeController").forward(request, response);
+        request.setAttribute("STATUS", "success");
+        request.getRequestDispatcher("send-feedback.jsp").forward(request, response);
 
     }
 

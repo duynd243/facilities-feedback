@@ -117,4 +117,9 @@ public class FeedbackDTO {
         this.statusID = statusID;
     }
 
+    @Override
+    public String toString() {
+        return "FeedbackDTO{" + "feedbackID=" + feedbackID + ", senderEmail=" + senderEmail + ", title=" + title + ", description=" + description + ", sentTime=" + sentTime + ", handlerEmail=" + handlerEmail + ", roomNumber=" + roomNumber + ", facilityID=" + facilityID + ", statusID=" + statusID + '}';
+    }
+
 }

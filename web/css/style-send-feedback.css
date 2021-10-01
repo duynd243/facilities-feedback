@@ -44,6 +44,9 @@ header {
     background-color: rgb(199, 197, 197);
 }
 
+#signoutlink{
+    padding: 9px 70px;
+}
 .show {
     display: block;
 }
@@ -61,6 +64,7 @@ header {
 }
 
 .dropdown-content .sign-out {
+    cursor: pointer;
     background-color: #ddd;
     padding: 8px 0;
     margin-top: 10px;
@@ -87,6 +91,7 @@ header {
 }
 
 .profile-picture {
+    cursor: pointer;
     width: 35px;
     border-radius: 50%;
     margin-left: 20px;
@@ -159,6 +164,7 @@ main {
 }
 
 .buttons .sbbutton {
+    cursor: pointer;
     border: none;
     border-radius: 20px;
     padding: 10px 0 10px 30px;
@@ -282,6 +288,7 @@ input[type="radio"] {
 }
 
 .label-box {
+    cursor: pointer;
     text-align: center;
     justify-content: center;
     font-family: Arial, Helvetica, sans-serif;
@@ -311,7 +318,7 @@ input[type="radio"]:checked+#radio-label .label-box {
 }
 
 .facilities {
-    
+
 }
 
 #radio-label {
@@ -331,6 +338,7 @@ input[type=file]::file-selector-button {
 }
 
 .upload-button {
+    cursor: pointer;
     width: 200px;
     margin-left: 1.875vw;
     margin-right: 10px;
@@ -351,6 +359,7 @@ input[type=file]::file-selector-button {
 }
 
 .send {
+    cursor: pointer;
     display: flex;
     align-items: center;
     margin-top: 15px;
@@ -387,6 +396,7 @@ input[type=file]::file-selector-button {
 }
 
 .feedback-category {
+    cursor: pointer;
     background-color: #ffffff;
     display: flex;
     align-items: center;
@@ -437,6 +447,7 @@ input[type=file]::file-selector-button {
 }
 
 .feedback-item {
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -521,6 +532,7 @@ input[type=file]::file-selector-button {
 }
 
 .fbp-back {
+    cursor: pointer;
     display: flex;
     align-items: center;
     font-family: "Noto Sans", sans-serif;
