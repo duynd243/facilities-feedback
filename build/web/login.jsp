@@ -52,9 +52,7 @@
     <body>
         <header>
             <div class="header-left">
-                <a href="landing.html">
                 <img src="images/fpt.png">
-                </a>
                 <div id="logo-text">Facilities Feedback</div>
             </div>
             <div class="header-right">
