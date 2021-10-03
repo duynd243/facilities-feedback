@@ -10,5 +10,9 @@ package googleuser;
  * @author Duy
  */
 public class Constant {
-    public static String GOOGLE_CLIENT_ID ="425259915867-leqmoeru62bgvq5mml47ai9chg8itdaq.apps.googleusercontent.com";
+    //local
+    public static String GOOGLE_CLIENT_ID = "425259915867-leqmoeru62bgvq5mml47ai9chg8itdaq.apps.googleusercontent.com";
+
+    //domain
+    //public static String GOOGLE_CLIENT_ID = "425259915867-s94p7e7d84dndkclschivtcedanor48c.apps.googleusercontent.com";
 }

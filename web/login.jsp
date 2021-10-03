@@ -4,6 +4,7 @@
     Author     : Duy
 --%>
 
+<%@page import="utils.TimeUtils"%>
 <%@page import="googleuser.Constant"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -71,6 +72,7 @@
                     <i id="fa-user-circle" class="fa fa-user-circle" aria-hidden="true"></i>
 
                     <div class="title">WELCOME</div>
+
                 </div>
                 <p>Signin to start using our system.</p>
 

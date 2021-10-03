@@ -606,7 +606,7 @@ input[type=file]::file-selector-button {
 .fbp-image{
     border-radius: 5px;
     width: 800px;
-    margin: 0 auto;
+    margin: 15px auto;
     display: block;
     box-shadow: 1px 1px 8px 0px rgb(0 0 0 / 10%);
 }
@@ -706,4 +706,10 @@ footer i {
     .error {
         width: 70vw;
     }
+}
+
+@media screen and (max-width: 1170px) {
+.fbp-image{
+ width: 69vw;
+}
 }

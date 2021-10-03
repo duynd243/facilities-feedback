@@ -18,6 +18,7 @@
 
 <% GoogleUserDTO loggedInUser = (GoogleUserDTO) session.getAttribute("LOGGED_IN_USER"); %>
 <% FacilityDAO facilityDAO = new FacilityDAO();%>
+<% ImageDAO imageDAO = new ImageDAO();%>
 <% ArrayList<FacilityDTO> facilitiesList = (ArrayList<FacilityDTO>) facilityDAO.getAllFacilities();%>
 <% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 1); %>
 <% ArrayList<FeedbackDTO> feedbackList2 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 2); %>
@@ -68,7 +69,7 @@
                 });
             }
 
-            function onloadFunction() {
+            window.onload = function onloadFunction() {
                 var post = document.getElementById("postStatus").value;
 
                 if (post == 'success') {
@@ -79,7 +80,7 @@
 
         </script>
     </head>
-    <body onload="onloadFunction()">
+    <body>
 
         <% if (request.getAttribute("STATUS") != null) {%>
         <input id="postStatus" type="hidden" value="<%=request.getAttribute("STATUS")%>">
@@ -249,7 +250,7 @@
                                         $("button[type = 'submit']").click(function () {
                                             var $fileUpload = $("input[type='file']");
                                             if (parseInt($fileUpload.get(0).files.length) > 2) {
-                                                alert("You are only allowed to upload a maximum of 2 files");
+                                                alert("You are only allowed to upload a maximum of 2 images");
                                                 return false;
                                             }
                                         });
@@ -288,39 +289,39 @@
                     <div class="feedback-category-content" id="pending-content">
 
                         <% if (feedbackList1.size() != 0) {%>
-                        <% for (FeedbackDTO f1 : feedbackList1) {%>
-                        <%String feedbackID = f1.getFeedbackID().trim();%>
+                        <% for (FeedbackDTO f : feedbackList1) {%>
+                        <%String feedbackID = f.getFeedbackID().trim();%>
                         <div class="pending-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className)">
                             <div class="item-left">
                                 <img class="feedback-profilepic-list"
                                      src="<%=loggedInUser.getPicture().trim()%>">
                                 <div class="title-description">
-                                    <div class="feedback-title-list"><%=f1.getTitle().trim()%></div>
-                                    <div class="feedback-description-list"><%=f1.getDescription().trim()%></div>
+                                    <div class="feedback-title-list"><%=f.getTitle().trim()%></div>
+                                    <div class="feedback-description-list"><%=f.getDescription().trim()%></div>
                                 </div>
                             </div>
                             <div class="item-right">
                                 <div class="location-time">
                                     <div class="feedback-location-list">
-                                        <ion-icon name="location"></ion-icon>Room <%=f1.getRoomNumber()%>
+                                        <ion-icon name="location"></ion-icon>Room <%=f.getRoomNumber()%>
                                     </div>
-                                    <div class="feedback-senttime-list"><%=TimeUtils.renderedTime(f1.getSentTime().trim())%></div>
+                                    <div class="feedback-senttime-list"><%=TimeUtils.renderedTime(f.getSentTime().trim())%></div>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="<%=f1.getFeedbackID().trim()%>" class="feeback-post" style="display: none;">
+                        <div id="<%=f.getFeedbackID().trim()%>" class="feeback-post" style="display: none;">
                             <div onclick="wayBack('<%=feedbackID%>', 'pending-item')" class="fbp-back">
                                 <i class="material-icons-outlined">chevron_left</i>
                                 Back
                             </div>
-                            <h1 class="fbp-title"><%=f1.getTitle().trim()%></h1>
+                            <h1 class="fbp-title"><%=f.getTitle().trim()%></h1>
 
                             <div class="fbp-aftertitle">
                                 <div class="sender-time">
                                     <img class="fbp-profilepic"
-                                         src="https://lh3.googleusercontent.com/a/AATXAJxPxz0xf1QV3YjGMZIava1b17obCvA-MTsxBRLj=s96-c">
-                                    <div>Sent by You (<%=loggedInUser.getEmail().trim()%>)</br>at <%=TimeUtils.renderedTime(f1.getSentTime().trim())%></div>
+                                         src="<%=loggedInUser.getPicture().trim()%>">
+                                    <div>Sent by You (<%=loggedInUser.getEmail().trim()%>)</br>at <%=TimeUtils.renderedTime(f.getSentTime().trim())%></div>
                                 </div>
                                 <div class="facility-location">
                                     <div class="fbp-facility" style="display: flex; align-items: center;">
@@ -328,7 +329,7 @@
                                         <div>
                                             <% String facilityName = ""; %> 
                                             <%for (FacilityDTO facility : facilitiesList) {%>
-                                            <% if (facility.getFacilityID().equals(f1.getFacilityID())) {
+                                            <% if (facility.getFacilityID().equals(f.getFacilityID())) {
                                                     facilityName = facility.getFacilityName();
                                                 } %>
                                             <%}%>
@@ -338,7 +339,7 @@
                                     <div class="fbp-location" style="display: flex; align-items: center;">
                                         <i class="material-icons">house</i>
                                         <div>
-                                            <b>Location</b><br>Room <%=f1.getRoomNumber()%>
+                                            <b>Location</b><br>Room <%=f.getRoomNumber()%>
                                         </div>
                                     </div>
 
@@ -346,10 +347,15 @@
                             </div>
 
                             <hr style="height:1.5px; border:none; background-color:#ddd; margin-bottom: 20px;">
+
+                            <% ArrayList<ImageDTO> imagesList = (ArrayList<ImageDTO>) imageDAO.getImagesList(f.getFeedbackID()); %>
+
+                            <% for (ImageDTO image : imagesList) {%>
                             <img class="fbp-image"
-                                 src="https://hcmuni.fpt.edu.vn/Data/Sites/1/media/2020-kim-vi/seo/campus/1-truong-dai-hoc-fpt-tphcm/truong-dai-hoc-fpt-tp-hcm-(1).jpg"
-                                 alt="">
-                            <p class="fbp-description"><%=f1.getDescription().trim()%></p>
+                                 src="<%=image.getImageURL()%>"
+                                 style="margin: 15px auto;">
+                            <%}%>
+                            <p class="fbp-description"><%=f.getDescription().trim()%></p>
                         </div>        
 
                         <%}
@@ -389,10 +395,168 @@
                         }
                     </script>
                     <div class="feedback-category-content" id="processing-content" style="display: none;">
+                        <% if (feedbackList2.size() != 0) {%>
+                        <% for (FeedbackDTO f : feedbackList2) {%>
+                        <%String feedbackID = f.getFeedbackID().trim();%>
+                        <div class="pending-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className)">
+                            <div class="item-left">
+                                <img class="feedback-profilepic-list"
+                                     src="<%=loggedInUser.getPicture().trim()%>">
+                                <div class="title-description">
+                                    <div class="feedback-title-list"><%=f.getTitle().trim()%></div>
+                                    <div class="feedback-description-list"><%=f.getDescription().trim()%></div>
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="location-time">
+                                    <div class="feedback-location-list">
+                                        <ion-icon name="location"></ion-icon>Room <%=f.getRoomNumber()%>
+                                    </div>
+                                    <div class="feedback-senttime-list"><%=TimeUtils.renderedTime(f.getSentTime().trim())%></div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <div id="<%=f.getFeedbackID().trim()%>" class="feeback-post" style="display: none;">
+                            <div onclick="wayBack('<%=feedbackID%>', 'pending-item')" class="fbp-back">
+                                <i class="material-icons-outlined">chevron_left</i>
+                                Back
+                            </div>
+                            <h1 class="fbp-title"><%=f.getTitle().trim()%></h1>
+
+                            <div class="fbp-aftertitle">
+                                <div class="sender-time">
+                                    <img class="fbp-profilepic"
+                                         src="<%=loggedInUser.getPicture().trim()%>">
+                                    <div>Sent by You (<%=loggedInUser.getEmail().trim()%>)</br>at <%=TimeUtils.renderedTime(f.getSentTime().trim())%></div>
+                                </div>
+                                <div class="facility-location">
+                                    <div class="fbp-facility" style="display: flex; align-items: center;">
+                                        <i class="material-icons">widgets</i>
+                                        <div>
+                                            <% String facilityName = ""; %> 
+                                            <%for (FacilityDTO facility : facilitiesList) {%>
+                                            <% if (facility.getFacilityID().equals(f.getFacilityID())) {
+                                                    facilityName = facility.getFacilityName();
+                                                } %>
+                                            <%}%>
+                                            <b>Facility</b><br><%=facilityName%>
+                                        </div>
+                                    </div>
+                                    <div class="fbp-location" style="display: flex; align-items: center;">
+                                        <i class="material-icons">house</i>
+                                        <div>
+                                            <b>Location</b><br>Room <%=f.getRoomNumber()%>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <hr style="height:1.5px; border:none; background-color:#ddd; margin-bottom: 20px;">
+
+                            <% ArrayList<ImageDTO> imagesList = (ArrayList<ImageDTO>) imageDAO.getImagesList(f.getFeedbackID()); %>
+
+                            <% for (ImageDTO image : imagesList) {%>
+                            <img class="fbp-image"
+                                 src="<%=image.getImageURL()%>"
+                                 alt="">
+                            <%}%>
+                            <p class="fbp-description"><%=f.getDescription().trim()%></p>
+                        </div>        
+
+                        <%}
+                        } else { %> 
+                        <div class="empty-feedback"
+                             style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
+                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
+                                There are no feedbacks for this section.</p>
+
+                        </div>
+                        <%}%>
                     </div>
                     <div class="feedback-category-content" id="completed-content" style="display: none;">
+                        <% if (feedbackList3.size() != 0) {%>
+                        <% for (FeedbackDTO f : feedbackList3) {%>
+                        <%String feedbackID = f.getFeedbackID().trim();%>
+                        <div class="pending-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className)">
+                            <div class="item-left">
+                                <img class="feedback-profilepic-list"
+                                     src="<%=loggedInUser.getPicture().trim()%>">
+                                <div class="title-description">
+                                    <div class="feedback-title-list"><%=f.getTitle().trim()%></div>
+                                    <div class="feedback-description-list"><%=f.getDescription().trim()%></div>
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="location-time">
+                                    <div class="feedback-location-list">
+                                        <ion-icon name="location"></ion-icon>Room <%=f.getRoomNumber()%>
+                                    </div>
+                                    <div class="feedback-senttime-list"><%=TimeUtils.renderedTime(f.getSentTime().trim())%></div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <div id="<%=f.getFeedbackID().trim()%>" class="feeback-post" style="display: none;">
+                            <div onclick="wayBack('<%=feedbackID%>', 'pending-item')" class="fbp-back">
+                                <i class="material-icons-outlined">chevron_left</i>
+                                Back
+                            </div>
+                            <h1 class="fbp-title"><%=f.getTitle().trim()%></h1>
+
+                            <div class="fbp-aftertitle">
+                                <div class="sender-time">
+                                    <img class="fbp-profilepic"
+                                         src="<%=loggedInUser.getPicture().trim()%>">
+                                    <div>Sent by You (<%=loggedInUser.getEmail().trim()%>)</br>at <%=TimeUtils.renderedTime(f.getSentTime().trim())%></div>
+                                </div>
+                                <div class="facility-location">
+                                    <div class="fbp-facility" style="display: flex; align-items: center;">
+                                        <i class="material-icons">widgets</i>
+                                        <div>
+                                            <% String facilityName = ""; %> 
+                                            <%for (FacilityDTO facility : facilitiesList) {%>
+                                            <% if (facility.getFacilityID().equals(f.getFacilityID())) {
+                                                    facilityName = facility.getFacilityName();
+                                                } %>
+                                            <%}%>
+                                            <b>Facility</b><br><%=facilityName%>
+                                        </div>
+                                    </div>
+                                    <div class="fbp-location" style="display: flex; align-items: center;">
+                                        <i class="material-icons">house</i>
+                                        <div>
+                                            <b>Location</b><br>Room <%=f.getRoomNumber()%>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <hr style="height:1.5px; border:none; background-color:#ddd; margin-bottom: 20px;">
+
+                            <% ArrayList<ImageDTO> imagesList = (ArrayList<ImageDTO>) imageDAO.getImagesList(f.getFeedbackID()); %>
+
+                            <% for (ImageDTO image : imagesList) {%>
+                            <img class="fbp-image"
+                                 src="<%=image.getImageURL()%>"
+                                 alt="">
+                            <%}%>
+                            <p class="fbp-description"><%=f.getDescription().trim()%></p>
+                        </div>        
+
+                        <%}
+                        } else { %> 
+                        <div class="empty-feedback"
+                             style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
+                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
+                                There are no feedbacks for this section.</p>
+
+                        </div>
+                        <%}%>
 
                     </div>
                 </div>

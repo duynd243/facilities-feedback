@@ -5,13 +5,18 @@
  */
 package controllers;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import feedback.FeedbackDAO;
 import feedback.FeedbackDTO;
 import image.ImageDAO;
 import image.ImageDTO;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
@@ -50,20 +55,37 @@ public class SendFeedbackController extends HttpServlet {
             e.printStackTrace();
         }
 
-        Part part = request.getPart("images");
+        Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", "dsyy2ay9q",
+                "api_key", "248543342141912",
+                "api_secret", "yhObRBg3HOuUG_lGMgNzjgg8Dzk"));
+
+        ArrayList<ImageDTO> imagesList = new ArrayList<>();
+
+        // Create images folder
         String path = getServletContext().getRealPath("/images");
-        String fileName = part.getSubmittedFileName();
         if (!Files.exists(Paths.get(path))) {
             Files.createDirectory(Paths.get(path));
         }
-        part.write(path + "/" + fileName);
 
-        ImageDTO image = new ImageDTO("images/" + fileName, feedbackID);
+        // Save image to given path -> upload image to CDN -> delete saved image on local -> insert image url to DB
+        for (Part part : request.getParts()) {
+            String fileName = part.getSubmittedFileName();
+            if (fileName != null) {
+                part.write(path + "/" + fileName);
+                File f = new File(path + "/" + fileName);
+                Map uploadResult = cloudinary.uploader().upload(f, ObjectUtils.emptyMap());
+                String imageURL = (String) uploadResult.get("url");
+                f.delete();
+                imagesList.add(new ImageDTO(imageURL, feedbackID));
+            }
+        }
         try {
-            imageDAO.insertFeedbackImages(image);
+            imageDAO.insertFeedbackImages(imagesList);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         request.setAttribute("STATUS", "success");
         request.getRequestDispatcher("send-feedback.jsp").forward(request, response);
 

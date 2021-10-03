@@ -2,6 +2,12 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/D:/FPTU/facilities-feedback/src/java/googleuser/Constant.java</file>
+            <file>file:/D:/FPTU/facilities-feedback/web/send-feedback.jsp</file>
+            <file>file:/D:/FPTU/facilities-feedback/web/css/style-send-feedback.css</file>
+            <file>file:/D:/FPTU/facilities-feedback/src/java/controllers/SendFeedbackController.java</file>
+            <file>file:/D:/FPTU/facilities-feedback/src/java/image/ImageDAO.java</file>
+        </group>
     </open-files>
 </project-private>
