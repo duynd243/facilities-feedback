@@ -70,9 +70,11 @@
             }
 
             window.onload = function onloadFunction() {
-                var post = document.getElementById("postStatus").value;
 
-                if (post == 'success') {
+                var urlParams = new URLSearchParams(window.location.search);
+
+                var status = urlParams.get('status');
+                if (status == 'success') {
                     selectSidebarMenu('m2', 'sent-feedback');
                     showSuccessToast();
                 }
@@ -81,11 +83,6 @@
         </script>
     </head>
     <body>
-
-        <% if (request.getAttribute("STATUS") != null) {%>
-        <input id="postStatus" type="hidden" value="<%=request.getAttribute("STATUS")%>">
-        <%}%>
-
         <div id="toast"></div>
         <div style="display: none" class="g-signin2" data-onsuccess="onSignIn" data-prompt="select_account"></div>
 

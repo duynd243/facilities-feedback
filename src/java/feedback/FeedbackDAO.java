@@ -126,4 +126,66 @@ public class FeedbackDAO {
         }
         return list;
     }
+
+    public List<FeedbackDTO> getListFeedback(GoogleUserDTO user, int statusID, int pageNum) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<FeedbackDTO> list = new ArrayList<>();
+        String senderEmail = user.getEmail();
+        int numFeedbacksPerPage = 4;
+        int startIndex, endIndex, size = 0;
+
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                String sql = "select COUNT(*) as size from tblFeedbacks WHERE senderEmail = ? AND statusID = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, senderEmail);
+                ps.setInt(2, statusID);
+                rs = ps.executeQuery();
+                rs.next();
+                size = rs.getInt("size");
+                endIndex = numFeedbacksPerPage * pageNum;
+                startIndex = endIndex - numFeedbacksPerPage + 1;
+
+                sql = "SELECT *\n"
+                        + "    FROM (\n"
+                        + "        SELECT *, ROW_NUMBER() OVER (ORDER BY sentTime desc) AS RowNum\n"
+                        + "        FROM tblFeedbacks where senderEmail = ? and statusID = ? \n"
+                        + "    ) AS MyDerivedTable\n"
+                        + "    WHERE (MyDerivedTable.RowNum BETWEEN ? AND ?)";
+
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, senderEmail);
+                ps.setInt(2, statusID);
+                ps.setInt(3, startIndex);
+                ps.setInt(4, endIndex);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    String feedbackID = rs.getString("feedbackID");
+                    String title = rs.getString("title");
+                    String description = rs.getString("description");
+                    String sentTime = rs.getString("sentTime");
+                    String handlerEmail = rs.getString("handlerEmail");
+                    int roomNumber = rs.getInt("roomNumber");
+                    String facilityID = rs.getString("facilityID");
+
+                    list.add(new FeedbackDTO(feedbackID, senderEmail, title, description, sentTime, handlerEmail, roomNumber, facilityID, statusID));
+                }
+            }
+        } catch (Exception e) {
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return list;
+    }
 }

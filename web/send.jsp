@@ -18,11 +18,14 @@
 
 <% GoogleUserDTO loggedInUser = (GoogleUserDTO) session.getAttribute("LOGGED_IN_USER"); %>
 <% FacilityDAO facilityDAO = new FacilityDAO();%>
+<% FeedbackDAO feedbackDAO = new FeedbackDAO();%>
 <% ImageDAO imageDAO = new ImageDAO();%>
 <% ArrayList<FacilityDTO> facilitiesList = (ArrayList<FacilityDTO>) facilityDAO.getAllFacilities();%>
-<% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 1); %>
-<% ArrayList<FeedbackDTO> feedbackList2 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 2); %>
-<% ArrayList<FeedbackDTO> feedbackList3 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 3);%>
+
+
+<% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedback(loggedInUser, 1, 1); %>
+<% ArrayList<FeedbackDTO> feedbackList2 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedback(loggedInUser, 2, 1); %>
+<% ArrayList<FeedbackDTO> feedbackList3 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedback(loggedInUser, 3, 1);%>
 
 <!DOCTYPE html>
 <html>
@@ -365,7 +368,14 @@
 
                         </div>
                         <%}%>
+                        <div class="pagination" onclick="test()">
 
+                            <button class="page-btn">1</button>
+
+                            <div id="page-dropdown" class="page-dropdown">
+                                <div>Content</div>
+                            </div>
+                        </div>
                     </div>
 
                     <script>

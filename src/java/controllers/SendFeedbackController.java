@@ -11,10 +11,7 @@ import feedback.FeedbackDAO;
 import feedback.FeedbackDTO;
 import image.ImageDAO;
 import image.ImageDTO;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -62,21 +59,12 @@ public class SendFeedbackController extends HttpServlet {
 
         ArrayList<ImageDTO> imagesList = new ArrayList<>();
 
-        // Create images folder
-        String path = getServletContext().getRealPath("/images");
-        if (!Files.exists(Paths.get(path))) {
-            Files.createDirectory(Paths.get(path));
-        }
-
-        // Save image to given path -> upload image to CDN -> delete saved image on local -> insert image url to DB
+        // Upload image to CDN -> Get and insert image url to DB
         for (Part part : request.getParts()) {
             String fileName = part.getSubmittedFileName();
             if (fileName != null) {
-                part.write(path + "/" + fileName);
-                File f = new File(path + "/" + fileName);
-                Map uploadResult = cloudinary.uploader().upload(f, ObjectUtils.emptyMap());
+                Map uploadResult = cloudinary.uploader().upload(part.getInputStream().readAllBytes(), ObjectUtils.emptyMap());
                 String imageURL = (String) uploadResult.get("url");
-                f.delete();
                 imagesList.add(new ImageDTO(imageURL, feedbackID));
             }
         }
@@ -85,10 +73,7 @@ public class SendFeedbackController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        request.setAttribute("STATUS", "success");
-        request.getRequestDispatcher("send-feedback.jsp").forward(request, response);
-
+        response.sendRedirect("send-feedback.jsp?status=success");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
