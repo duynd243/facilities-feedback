@@ -24,13 +24,16 @@ public class GoogleUserDAO {
         String roleID = "";
         try {
             conn = DBUtils.getConnection();
-            String sql = "SELECT * FROM tblUsers WHERE email = ? AND statusID = 1";
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, email);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                roleID = rs.getString("roleID").trim();
+            if (conn != null) {
+                String sql = "SELECT * FROM tblUsers WHERE email = ? AND statusID = 1";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, email);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    roleID = rs.getString("roleID").trim();
+                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -59,8 +62,6 @@ public class GoogleUserDAO {
             ps.setString(3, user.getPicture());
             ps.setString(4, "US");
             ps.setInt(5, 1);
-            int x = 0;
-            x=ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

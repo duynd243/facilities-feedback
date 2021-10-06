@@ -14,11 +14,12 @@ import java.sql.SQLException;
  * @author Duy
  */
 public class DBUtils {
+
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Connection conn = null;
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        String url = "jdbc:sqlserver://database-1.c9nrangp3jj8.ap-southeast-1.rds.amazonaws.com;databaseName=FacilitiesFeedback";
-        conn = DriverManager.getConnection(url, "admin", "Nguyenduy111");
+        String url = "jdbc:sqlserver://" + ConfigUtils.DB_URL + ";databaseName=" + ConfigUtils.DB_NAME;
+        conn = DriverManager.getConnection(url, ConfigUtils.DB_USER, ConfigUtils.DB_PASS);
         return conn;
     }
 }

@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import utils.ConfigUtils;
 import utils.TimeUtils;
 
 /**
@@ -51,11 +52,14 @@ public class SendFeedbackController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        String cloud_name = ConfigUtils.CL_NAME;
+        String api_key = ConfigUtils.CL_API_KEY;
+        String api_secret = ConfigUtils.CL_API_SECRET;
+        
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", "dsyy2ay9q",
-                "api_key", "248543342141912",
-                "api_secret", "yhObRBg3HOuUG_lGMgNzjgg8Dzk"));
+                "cloud_name", cloud_name,
+                "api_key", api_key,
+                "api_secret", api_secret));
 
         ArrayList<ImageDTO> imagesList = new ArrayList<>();
 
