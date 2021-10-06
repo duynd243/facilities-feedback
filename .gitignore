@@ -6,4 +6,4 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-src/java/config
+src/java/config/config.properties
