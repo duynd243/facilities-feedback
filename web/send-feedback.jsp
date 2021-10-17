@@ -4,6 +4,7 @@
     Author     : Duy
 --%>
 
+<%@page import="utils.PaginationUtils"%>
 <%@page import="facilities.FacilityDAO"%>
 <%@page import="image.ImageDAO"%>
 <%@page import="image.ImageDTO"%>
@@ -18,11 +19,54 @@
 
 <% GoogleUserDTO loggedInUser = (GoogleUserDTO) session.getAttribute("LOGGED_IN_USER"); %>
 <% FacilityDAO facilityDAO = new FacilityDAO();%>
+<% FeedbackDAO feedbackDAO = new FeedbackDAO();%>
 <% ImageDAO imageDAO = new ImageDAO();%>
 <% ArrayList<FacilityDTO> facilitiesList = (ArrayList<FacilityDTO>) facilityDAO.getAllFacilities();%>
-<% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 1); %>
-<% ArrayList<FeedbackDTO> feedbackList2 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 2); %>
-<% ArrayList<FeedbackDTO> feedbackList3 = (ArrayList<FeedbackDTO>) FeedbackDAO.getListFeedback(loggedInUser, 3);%>
+
+
+<% int numOfPendingFeedbacks = feedbackDAO.getNumOfFeedbacksOfSender(loggedInUser, 1); %>
+<% int numOfProcessingFeedbacks = feedbackDAO.getNumOfFeedbacksOfSender(loggedInUser, 2); %>
+<% int numOfCompletedFeedbacks = feedbackDAO.getNumOfFeedbacksOfSender(loggedInUser, 3); %>
+
+
+<% int currentPageList1 = 1; %>
+<% int currentPageList2 = 1; %>
+<% int currentPageList3 = 1; %>
+
+<% int currentPageList = 0; %>
+<% int numOfFeedbacks = 0; %>
+<% String pageSection = ""; %>
+
+
+<%!
+    public String getSection(String section) {
+        String result = "";
+        if ("pending".equalsIgnoreCase(section) || "processing".equalsIgnoreCase(section) || "completed".equalsIgnoreCase(section)) {
+            result = section;
+        } else {
+            result = "pending";
+        }
+        return result;
+    }
+%>
+
+
+<% String section = getSection(request.getParameter("section"));%>
+<% String current = request.getParameter("page");%>
+
+<% if ("pending".equalsIgnoreCase(section)) {
+        currentPageList1 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfPendingFeedbacks));
+    }%>
+<% if ("processing".equalsIgnoreCase(section)) {
+        currentPageList2 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfProcessingFeedbacks));
+    }%>
+<% if ("completed".equalsIgnoreCase(section)) {
+        currentPageList3 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfCompletedFeedbacks));
+    }%>
+
+<% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackOfSender(loggedInUser, 1, currentPageList1); %>
+<% ArrayList<FeedbackDTO> feedbackList2 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackOfSender(loggedInUser, 2, currentPageList2); %>
+<% ArrayList<FeedbackDTO> feedbackList3 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackOfSender(loggedInUser, 3, currentPageList3);%>
 
 <!DOCTYPE html>
 <html>
@@ -78,8 +122,19 @@
                     selectSidebarMenu('m2', 'sent-feedback');
                     showSuccessToast();
                 }
-            }
 
+                var section = urlParams.get('section');
+                if (section == 'processing') {
+                    selectSidebarMenu('m2', 'sent-feedback');
+                    selectFeedbackCategory('f2', 'processing-content');
+                } else if (section == 'completed') {
+                    selectSidebarMenu('m2', 'sent-feedback');
+                    selectFeedbackCategory('f3', 'completed-content');
+                } else if (section == 'pending') {
+                    selectSidebarMenu('m2', 'sent-feedback');
+                    selectFeedbackCategory('f1', 'pending-content');
+                }
+            }
         </script>
     </head>
     <body>
@@ -214,11 +269,11 @@
                         <div class="ilabel" style="margin-top: 30px;">Choose facility</div>
 
                         <div class="facilities" style ="margin: 0 1.875vw;display: grid;grid-template-columns: repeat(<%=facilitiesList.size()%>, 1fr);grid-template-rows: 1;gap: 20px;">
-                            <% int i = 0; %>
+                            <% int n = 0; %>
                             <% for (FacilityDTO f : facilitiesList) {
-                                    i++;%>
-                            <input type="radio" id="facility<%=i%>" name="facilityID" class="facilityID" value="<%=f.getFacilityID()%>" required>
-                            <label style="grid-column: <%=i%>;" id="radio-label" for="facility<%=i%>">
+                                    n++;%>
+                            <input type="radio" id="facility<%=n%>" name="facilityID" class="facilityID" value="<%=f.getFacilityID()%>" required>
+                            <label style="grid-column: <%=n%>;" id="radio-label" for="facility<%=n%>">
                                 <div class="label-box"><%=f.getFacilityName()%></div>
                             </label>
                             <%}%>
@@ -271,15 +326,15 @@
                                 onclick="selectFeedbackCategory(id, 'pending-content')">
                             <ion-icon name="hourglass-outline"></ion-icon>
                             Pending
-                            <div class="badge-num"><%=feedbackList1.size()%></div>
+                            <div class="badge-num"><%=numOfPendingFeedbacks%></div>
                         </button>
                         <button id="f2" class="feedback-category"
                                 onclick="selectFeedbackCategory(id, 'processing-content')">
-                            <ion-icon name="hammer-outline"></ion-icon>Processing <div class="badge-num"><%=feedbackList2.size()%></div>
+                            <ion-icon name="hammer-outline"></ion-icon>Processing <div class="badge-num"><%=numOfProcessingFeedbacks%></div>
                         </button>
                         <button id="f3" class="feedback-category" onclick="selectFeedbackCategory(id, 'completed-content')">
                             <ion-icon name="checkmark-done-outline"></ion-icon>Completed
-                            <div class="badge-num"><%=feedbackList3.size()%></div>
+                            <div class="badge-num"><%=numOfCompletedFeedbacks%></div>
                         </button>
                     </div>
 
@@ -288,7 +343,7 @@
                         <% if (feedbackList1.size() != 0) {%>
                         <% for (FeedbackDTO f : feedbackList1) {%>
                         <%String feedbackID = f.getFeedbackID().trim();%>
-                        <div class="pending-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className)">
+                        <div class="pending-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className, 'pagination1')">
                             <div class="item-left">
                                 <img class="feedback-profilepic-list"
                                      src="<%=loggedInUser.getPicture().trim()%>">
@@ -308,7 +363,7 @@
                         </div>
 
                         <div id="<%=f.getFeedbackID().trim()%>" class="feeback-post" style="display: none;">
-                            <div onclick="wayBack('<%=feedbackID%>', 'pending-item')" class="fbp-back">
+                            <div onclick="wayBack('<%=feedbackID%>', 'pending-item', 'pagination1')" class="fbp-back">
                                 <i class="material-icons-outlined">chevron_left</i>
                                 Back
                             </div>
@@ -366,36 +421,84 @@
                         </div>
                         <%}%>
 
+
+
+                        <!--PHÂN TRANG-->
+
+                        <div class="pagination-container">
+                            <%currentPageList = currentPageList1; %>
+                            <%numOfFeedbacks = numOfPendingFeedbacks; %>
+                            <%pageSection = "pending"; %>
+
+                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+
+                            <div class="pagination" id="pagination1">
+
+                                <%if (currentPageList != 1) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
+                                <%}%>    
+
+                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>
+                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+
+
+                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>
+
+                                <% } else if (currentPageList - 2 <= 0) {%>
+
+                                <% for (int i = 1; i <= 5; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>    
+
+                                <%} else {%> 
+
+
+                                <% for (int i = currentPageList - 2; i <= currentPageList + 2; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>      
+
+
+                                <%}%>
+                                <% } %>
+
+
+                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%}%>
+                            </div>
+                            <%}%>
+                        </div>
+                        <!--PHÂN TRANG-->
+
                     </div>
 
-                    <script>
-                        function openFeedback(itemToShow, classToHide) {
-                            var i;
-                            var index = classToHide.indexOf(' ');
-                            var classToHide2 = classToHide.substring(0, index);
-                            var x = document.getElementsByClassName(classToHide2);
-                            for (i = 0; i < x.length; i++) {
-                                x[i].style.display = "none";
-                            }
-                            document.getElementById(itemToShow).style.display = "block";
-                        }
-
-                        function wayBack(itemToHide, classToShow) {
-                            var i;
-                            var x = document.getElementById(itemToHide);
-                            x.style.display = "none";
-                            var y = document.getElementsByClassName(classToShow);
-                            for (i = 0; i < y.length; i++) {
-                                y[i].style.display = "flex";
-                            }
-
-                        }
-                    </script>
                     <div class="feedback-category-content" id="processing-content" style="display: none;">
                         <% if (feedbackList2.size() != 0) {%>
                         <% for (FeedbackDTO f : feedbackList2) {%>
                         <%String feedbackID = f.getFeedbackID().trim();%>
-                        <div class="pending-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className)">
+                        <div class="processing-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className, 'pagination2')">
                             <div class="item-left">
                                 <img class="feedback-profilepic-list"
                                      src="<%=loggedInUser.getPicture().trim()%>">
@@ -415,7 +518,7 @@
                         </div>
 
                         <div id="<%=f.getFeedbackID().trim()%>" class="feeback-post" style="display: none;">
-                            <div onclick="wayBack('<%=feedbackID%>', 'pending-item')" class="fbp-back">
+                            <div onclick="wayBack('<%=feedbackID%>', 'processing-item', 'pagination2')" class="fbp-back">
                                 <i class="material-icons-outlined">chevron_left</i>
                                 Back
                             </div>
@@ -472,12 +575,86 @@
 
                         </div>
                         <%}%>
+
+
+
+
+                        <!--PHÂN TRANG-->
+
+                        <div class="pagination-container">
+                            <%currentPageList = currentPageList2; %>
+                            <%numOfFeedbacks = numOfProcessingFeedbacks; %>
+                            <%pageSection = "processing"; %>
+
+                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+
+                            <div class="pagination" id="pagination2">
+
+                                <%if (currentPageList != 1) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
+                                <%}%>    
+
+                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>
+                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+
+
+                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>
+
+                                <% } else if (currentPageList - 2 <= 0) {%>
+
+                                <% for (int i = 1; i <= 5; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>    
+
+                                <%} else {%> 
+
+
+                                <% for (int i = currentPageList - 2; i <= currentPageList + 2; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>      
+
+
+                                <%}%>
+                                <% } %>
+
+
+                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%}%>
+                            </div>
+                            <%}%>
+                        </div>
+                        <!--PHÂN TRANG-->
+
                     </div>
+
                     <div class="feedback-category-content" id="completed-content" style="display: none;">
                         <% if (feedbackList3.size() != 0) {%>
                         <% for (FeedbackDTO f : feedbackList3) {%>
                         <%String feedbackID = f.getFeedbackID().trim();%>
-                        <div class="pending-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className)">
+                        <div class="completed-item feedback-item" onclick="openFeedback('<%=feedbackID%>', this.className, 'pagination3')">
                             <div class="item-left">
                                 <img class="feedback-profilepic-list"
                                      src="<%=loggedInUser.getPicture().trim()%>">
@@ -497,7 +674,7 @@
                         </div>
 
                         <div id="<%=f.getFeedbackID().trim()%>" class="feeback-post" style="display: none;">
-                            <div onclick="wayBack('<%=feedbackID%>', 'pending-item')" class="fbp-back">
+                            <div onclick="wayBack('<%=feedbackID%>', 'completed-item', 'pagination3')" class="fbp-back">
                                 <i class="material-icons-outlined">chevron_left</i>
                                 Back
                             </div>
@@ -555,7 +732,78 @@
                         </div>
                         <%}%>
 
+                        <!--PHÂN TRANG-->
+
+                        <div class="pagination-container">
+                            <%currentPageList = currentPageList3; %>
+                            <%numOfFeedbacks = numOfCompletedFeedbacks; %>
+                            <%pageSection = "completed"; %>
+
+                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+
+                            <div class="pagination" id="pagination3">
+
+                                <%if (currentPageList != 1) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
+                                <%}%>    
+
+                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>
+                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+
+
+                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>
+
+                                <% } else if (currentPageList - 2 <= 0) {%>
+
+                                <% for (int i = 1; i <= 5; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>    
+
+                                <%} else {%> 
+
+
+                                <% for (int i = currentPageList - 2; i <= currentPageList + 2; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
+                                    <% } %>    
+                                    <% } %>      
+
+
+                                <%}%>
+                                <% } %>
+
+
+                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%}%>
+                            </div>
+                            <%}%>
+                        </div>
+                        <!--PHÂN TRANG-->
+
+
                     </div>
+
                 </div>
             </div>
 
@@ -584,5 +832,41 @@
 
         </footer>
 
+
+
+        <script>
+            function openFeedback(itemToShow, classToHide, paginationToHide) {
+                var i;
+                var index = classToHide.indexOf(' ');
+                var classToHide2 = classToHide.substring(0, index);
+                var x = document.getElementsByClassName(classToHide2);
+                for (i = 0; i < x.length; i++) {
+                    x[i].style.display = "none";
+                }
+                var pagination = document.getElementById(paginationToHide);
+                if (pagination !== null)
+                    pagination.style.display = "none";
+                document.getElementById(itemToShow).style.display = "block";
+            }
+
+            function wayBack(itemToHide, classToShow, paginationToShow) {
+                var i;
+                var x = document.getElementById(itemToHide);
+                x.style.display = "none";
+                var y = document.getElementsByClassName(classToShow);
+                for (i = 0; i < y.length; i++) {
+                    y[i].style.display = "flex";
+                }
+
+                var pagination = document.getElementById(paginationToShow);
+                if (pagination !== null)
+                    pagination.style.display = "flex";
+
+            }
+        </script>
+
     </body>
+
+
+
 </html>

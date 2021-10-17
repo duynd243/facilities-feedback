@@ -4,11 +4,16 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/D:/FPTU/facilities-feedback/src/java/utils/ConfigUtils.java</file>
-            <file>file:/D:/FPTU/facilities-feedback/src/java/googleuser/Constant.java</file>
+            <file>file:/D:/FPTU/facilities-feedback/src/java/config/config</file>
             <file>file:/D:/FPTU/facilities-feedback/src/java/utils/DBUtils.java</file>
-            <file>file:/D:/FPTU/facilities-feedback/web/META-INF/context.xml</file>
-            <file>file:/D:/FPTU/facilities-feedback/src/java/feedback/FeedbackDTO.java</file>
+            <file>file:/D:/FPTU/facilities-feedback/src/java/facilities/FacilityDTO.java</file>
+            <file>file:/D:/FPTU/facilities-feedback/web/send-feedback.jsp</file>
+            <file>file:/D:/FPTU/facilities-feedback/web/send-feedback2.jsp</file>
+            <file>file:/D:/FPTU/facilities-feedback/web/css/style-send-feedback.css</file>
+            <file>file:/D:/FPTU/facilities-feedback/src/java/config/config.properties</file>
             <file>file:/D:/FPTU/facilities-feedback/src/java/feedback/FeedbackDAO.java</file>
+            <file>file:/D:/FPTU/facilities-feedback/src/java/config/README.txt</file>
+            <file>file:/D:/FPTU/facilities-feedback/src/java/utils/PaginationUtils.java</file>
         </group>
     </open-files>
 </project-private>

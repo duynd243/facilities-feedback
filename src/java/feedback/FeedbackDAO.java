@@ -127,7 +127,7 @@ public class FeedbackDAO {
         return list;
     }
 
-    public List<FeedbackDTO> getListFeedback(GoogleUserDTO user, int statusID, int pageNum) throws SQLException {
+    public List<FeedbackDTO> getListFeedbackOfSender(GoogleUserDTO user, int statusID, int pageNum) throws SQLException {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -187,5 +187,39 @@ public class FeedbackDAO {
             }
         }
         return list;
+    }
+
+    public int getNumOfFeedbacksOfSender(GoogleUserDTO user, int statusID) throws SQLException {
+        int result = 0;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String senderEmail = user.getEmail();
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                String sql = "SELECT COUNT(*) as count FROM tblFeedbacks WHERE senderEmail = ? AND statusID = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, senderEmail);
+                ps.setInt(2, statusID);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    result = rs.getInt("count");
+                }
+
+            }
+        } catch (Exception e) {
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return result;
     }
 }
