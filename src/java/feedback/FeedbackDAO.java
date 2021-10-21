@@ -139,22 +139,23 @@ public class FeedbackDAO {
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                String sql = "select COUNT(*) as size from tblFeedbacks WHERE senderEmail = ? AND statusID = ?";
-                ps = conn.prepareStatement(sql);
-                ps.setString(1, senderEmail);
-                ps.setInt(2, statusID);
-                rs = ps.executeQuery();
-                rs.next();
-                size = rs.getInt("size");
                 endIndex = numFeedbacksPerPage * pageNum;
                 startIndex = endIndex - numFeedbacksPerPage + 1;
 
-                sql = "SELECT *\n"
+                String sql = "SELECT *\n"
                         + "    FROM (\n"
                         + "        SELECT *, ROW_NUMBER() OVER (ORDER BY sentTime desc) AS RowNum\n"
                         + "        FROM tblFeedbacks where senderEmail = ? and statusID = ? \n"
                         + "    ) AS MyDerivedTable\n"
                         + "    WHERE (MyDerivedTable.RowNum BETWEEN ? AND ?)";
+                if (statusID == 2) {
+                    sql = "SELECT *\n"
+                            + "    FROM (\n"
+                            + "        SELECT *, ROW_NUMBER() OVER (ORDER BY sentTime desc) AS RowNum\n"
+                            + "        FROM tblFeedbacks where senderEmail = ? and (statusID = ? or statusID = 3) \n"
+                            + "    ) AS MyDerivedTable\n"
+                            + "    WHERE (MyDerivedTable.RowNum BETWEEN ? AND ?)";
+                }
 
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, senderEmail);
@@ -199,6 +200,9 @@ public class FeedbackDAO {
             conn = DBUtils.getConnection();
             if (conn != null) {
                 String sql = "SELECT COUNT(*) as count FROM tblFeedbacks WHERE senderEmail = ? AND statusID = ?";
+                if (statusID == 2) {
+                    sql = "SELECT COUNT(*) as count FROM tblFeedbacks WHERE senderEmail = ? AND (statusID = ? OR statusID = 3)";
+                }
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, senderEmail);
                 ps.setInt(2, statusID);
@@ -222,4 +226,121 @@ public class FeedbackDAO {
         }
         return result;
     }
+
+    public List<FeedbackDTO> getListFeedbackForManager(int statusID, int pageNum) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<FeedbackDTO> list = new ArrayList<>();
+        int numFeedbacksPerPage = 4;
+        int startIndex, endIndex, size = 0;
+
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+
+                endIndex = numFeedbacksPerPage * pageNum;
+                startIndex = endIndex - numFeedbacksPerPage + 1;
+
+                String sql = "SELECT *\n"
+                        + "    FROM (\n"
+                        + "        SELECT *, ROW_NUMBER() OVER (ORDER BY sentTime desc) AS RowNum\n"
+                        + "        FROM tblFeedbacks where statusID = ? \n"
+                        + "    ) AS MyDerivedTable\n"
+                        + "    WHERE (MyDerivedTable.RowNum BETWEEN ? AND ?)";
+
+                ps = conn.prepareStatement(sql);
+
+                ps.setInt(1, statusID);
+                ps.setInt(2, startIndex);
+                ps.setInt(3, endIndex);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    String feedbackID = rs.getString("feedbackID");
+                    String senderEmail = rs.getString("senderEmail");
+                    String title = rs.getString("title");
+                    String description = rs.getString("description");
+                    String sentTime = rs.getString("sentTime");
+                    String handlerEmail = rs.getString("handlerEmail");
+                    int roomNumber = rs.getInt("roomNumber");
+                    String facilityID = rs.getString("facilityID");
+
+                    list.add(new FeedbackDTO(feedbackID, senderEmail, title, description, sentTime, handlerEmail, roomNumber, facilityID, statusID));
+                }
+            }
+        } catch (Exception e) {
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return list;
+    }
+
+    public int getNumOfFeedbacksForManager(int statusID) throws SQLException {
+        int result = 0;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                String sql = "SELECT COUNT(*) as count FROM tblFeedbacks WHERE statusID = ?";
+
+                ps = conn.prepareStatement(sql);
+                ps.setInt(1, statusID);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    result = rs.getInt("count");
+                }
+
+            }
+        } catch (Exception e) {
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return result;
+    }
+
+    public boolean assignEmployee(String feedbackID, String handlerEmail) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        int check = 0;
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                String sql = "UPDATE tblFeedbacks set statusID = 2, handlerEmail = ?\n"
+                        + "where feedbackID = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, handlerEmail);
+                ps.setString(2, feedbackID);
+                check = ps.executeUpdate();
+            }
+        } catch (Exception e) {
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return check > 0;
+    }
+
 }

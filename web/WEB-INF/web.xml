@@ -20,6 +20,10 @@
         <servlet-name>SendFeedbackController</servlet-name>
         <servlet-class>controllers.SendFeedbackController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AssignEmployeeController</servlet-name>
+        <servlet-class>controllers.AssignEmployeeController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>MainController</servlet-name>
         <url-pattern>/MainController</url-pattern>
@@ -42,6 +46,10 @@
     <servlet-mapping>
         <servlet-name>SendFeedbackController</servlet-name>
         <url-pattern>/SendFeedbackController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AssignEmployeeController</servlet-name>
+        <url-pattern>/AssignEmployeeController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

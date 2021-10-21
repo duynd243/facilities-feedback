@@ -26,7 +26,7 @@
 
 <% int numOfPendingFeedbacks = feedbackDAO.getNumOfFeedbacksOfSender(loggedInUser, 1); %>
 <% int numOfProcessingFeedbacks = feedbackDAO.getNumOfFeedbacksOfSender(loggedInUser, 2); %>
-<% int numOfCompletedFeedbacks = feedbackDAO.getNumOfFeedbacksOfSender(loggedInUser, 3); %>
+<% int numOfCompletedFeedbacks = feedbackDAO.getNumOfFeedbacksOfSender(loggedInUser, 4); %>
 
 
 <% int currentPageList1 = 1; %>
@@ -66,7 +66,7 @@
 
 <% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackOfSender(loggedInUser, 1, currentPageList1); %>
 <% ArrayList<FeedbackDTO> feedbackList2 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackOfSender(loggedInUser, 2, currentPageList2); %>
-<% ArrayList<FeedbackDTO> feedbackList3 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackOfSender(loggedInUser, 3, currentPageList3);%>
+<% ArrayList<FeedbackDTO> feedbackList3 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackOfSender(loggedInUser, 4, currentPageList3);%>
 
 <!DOCTYPE html>
 <html>
@@ -866,7 +866,4 @@
         </script>
 
     </body>
-
-
-
 </html>

@@ -8,7 +8,6 @@ package controllers;
 import googleuser.GoogleUserDAO;
 import googleuser.GoogleUserDTO;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -33,39 +32,33 @@ public class LoginController extends HttpServlet {
         GoogleUserDTO user = GoogleUtils.getUserInfo(id_token);
 
         if (user.getHd() != null && user.getHd().equals("fpt.edu.vn")) {
-
+            String url = "";
             GoogleUserDAO userDAO = new GoogleUserDAO();
             String roleID = "";
             try {
-                roleID = userDAO.checkLogin(user.getEmail());
+                roleID = userDAO.checkLogin(user);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            RequestDispatcher rd = null;
-
-            if (!roleID.isEmpty()) {
-                user.setRoleID(roleID);
-            }
             if ("MG".equals(roleID)) {
-                rd = request.getRequestDispatcher(MANAGER_PAGE);
+                url = MANAGER_PAGE;
             } else if ("EP".equals(roleID)) {
-                rd = request.getRequestDispatcher(EMPLOYEE_PAGE);
+                url = EMPLOYEE_PAGE;
             } else if ("US".equals(roleID)) {
-                rd = request.getRequestDispatcher(USER_PAGE);
+                url = USER_PAGE;
             } else if (roleID.isEmpty()) {
+                user.setRoleID("US");
                 try {
-                    user.setRoleID("US");
                     userDAO.addNewUser(user);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                rd = request.getRequestDispatcher(USER_PAGE);
+                url = USER_PAGE;
             }
 
             HttpSession session = request.getSession();
             session.setAttribute("LOGGED_IN_USER", user);
-            rd.forward(request, response);
+            response.sendRedirect(url);
         } else {
             request.setAttribute("ERROR", "email");
             request.getRequestDispatcher("login-error.jsp").forward(request, response);

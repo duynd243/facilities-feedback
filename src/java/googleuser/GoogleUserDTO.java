@@ -10,11 +10,13 @@ package googleuser;
  * @author Duy
  */
 public class GoogleUserDTO {
+
     private String email;
     private String name;
     private String picture;
     private String roleID;
-    private String hd; // với các email có custom domain (không phải @gmail.com), json trả về sẽ có field hd chứa custom domain (ví dụ hd="fpt.edu.vn")
+    private String hd;
+    private int depID;
 
     public GoogleUserDTO() {
     }
@@ -25,6 +27,14 @@ public class GoogleUserDTO {
         this.picture = picture;
         this.roleID = roleID;
         this.hd = hd;
+    }
+
+    public GoogleUserDTO(String email, String name, String picture, String roleID, int depID) {
+        this.email = email;
+        this.name = name;
+        this.picture = picture;
+        this.roleID = roleID;
+        this.depID = depID;
     }
 
     public String getEmail() {
@@ -67,10 +77,17 @@ public class GoogleUserDTO {
         this.hd = hd;
     }
 
+    public int getDepID() {
+        return depID;
+    }
+
+    public void setDepID(int depID) {
+        this.depID = depID;
+    }
+
     @Override
     public String toString() {
-        return "GoogleUserDTO{" + "email=" + email + ", name=" + name + ", picture=" + picture + ", roleID=" + roleID + ", hd=" + hd + '}';
+        return "GoogleUserDTO{" + "email=" + email + ", name=" + name + ", picture=" + picture + ", roleID=" + roleID + ", hd=" + hd + ", depID=" + depID + '}';
     }
-    
-    
+
 }

@@ -133,12 +133,8 @@ main {
     border-top-left-radius: 10px;
     padding: 20px 0;
     text-align: center;
-    background: #FF416C;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #FF4B2B, #FF416C);
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #FF4B2B, #FF416C);
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right, #4f56a3, #2f9eb7);
+    
 }
 
 .welcome .picture {
@@ -160,7 +156,7 @@ main {
     border: none;
     padding: 4px 10px;
     border-radius: 8px;
-    background-color: #4e53bb;
+    background-color: #41c54f;
     font-family: 'Noto Sans', sans-serif;
     color: white;
 }
@@ -192,8 +188,8 @@ main {
 
 .buttons .sbbutton-active {
     transition: all 0.3s ease-out;
-    color: rgb(69, 126, 50);
-    background-color: rgb(195, 237, 201);
+    color: rgb(48, 58, 131);
+    background-color: rgb(186, 225, 233);
 }
 
 .buttons i {
@@ -319,6 +315,9 @@ input[type="radio"]:checked+#radio-label .label-box {
     border: 2px solid rgb(49, 221, 230);
 }
 
+.facilities {
+
+}
 
 #radio-label {
     grid-row: 1;
@@ -664,6 +663,198 @@ input[type=file]::file-selector-button {
     display: flex;
     align-items: center;
 }
+
+.fbp-assign-btn{
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    border: none;
+    background: linear-gradient(to right, #41a376, #2fa142);
+    color: white;
+    padding: 12px;
+    border-radius: 30px;
+}
+
+/* MODAL */
+
+.modal{
+    background: #808080ad;
+    display: none;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    height: 100%;
+    width: 100%;
+}
+
+.modal-assign-employee {
+    border-radius: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: auto;
+    height: 480px;
+    width: 490px;
+    background-color: rgb(255, 255, 255);
+
+}
+
+.modal-department .modal-close-icon {
+    display: flex;
+    justify-content: flex-end;
+
+}
+
+.modal-department #modal-close-icon {
+    margin: 15px;
+    float: right;
+    color: white;
+    background-color: rgb(202, 35, 35);
+    border-radius: 50%;
+
+}
+
+.modal-department .modal-title {
+    display: block;
+    text-align: center;
+    font-size: 30px;
+}
+
+.department-wrapper {
+    margin-top: 20px;
+    height: 330px;
+    overflow: auto;
+}
+
+.employee-wrapper {
+    height: 350px;
+    overflow: auto;
+}
+
+.department {
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    border: 1px solid gainsboro;
+    margin: 10px auto;
+    padding: 10px 15px;
+    transition: all ease 0.3s;
+    box-shadow: 1px 1px 2px 0px rgb(0 0 0 / 10%);
+}
+
+.department:hover {
+    width: 85%;
+}
+
+.number-employees {
+    padding: 5px 6px;
+    border-radius: 10px;
+    font-size: 15px;
+    background: rgb(22, 136, 170);
+    color: rgb(255, 255, 255);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.modal-employee {
+    padding: 20px 0;
+}
+
+.modal-back-btn {
+    margin: 15px;
+    margin-left: 25px;
+    display: flex;
+    align-items: center;
+    border: none;
+    font-size: 16px;
+    background-color: #2f64a5;
+    color: white;
+    padding-right: 12px;
+    border-radius: 10px;
+}
+
+.modal-back-btn:hover {
+    background-color: #0a55b1;
+    color: white;
+}
+
+.employee-to-assign {
+    width: 82%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    border: 1px solid gainsboro;
+    margin: 15px auto;
+    padding: 10px 15px;
+    transition: all ease 0.3s;
+    box-shadow: 1px 1px 2px 0px rgb(0 0 0 / 10%);
+}
+
+.employee-to-assign:hover {
+    width: 87%;
+}
+
+.employee-pic img {
+    width: 55px;
+    border-radius: 50%;
+}
+
+.employee-name {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.employee-badge {
+    display: flex;
+    align-items: center;
+}
+
+.employee-badge,
+.employee-badge span {
+    font-size: 15px;
+}
+
+.employee-rate {
+    margin-right: 5px;
+    color: #ffffff;
+    border-radius: 15px;
+    background: linear-gradient(to right, #4e9d6a, #20b789);
+    padding: 4px 8px;
+}
+
+.employee-proccessing {
+    margin-right: 5px;
+    color: #ffffff;
+    border-radius: 15px;
+    background: linear-gradient(to right, #2c459f, #2d7fc5);
+    padding: 4px 8px;
+}
+
+.employee-completed {
+    margin-right: 5px;
+    color: #ffffff;
+    border-radius: 15px;
+    background: linear-gradient(to right, #87157e, #a13398);
+    padding: 4px 8px;
+}
+
+.assign-btn {
+    background: #6abd4f;
+    border: none;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 16px;
+    box-shadow: 1px 1px 2px 0px rgb(0 0 0 / 10%);
+    color: white;
+}
+/* MODAL */
 
 footer {
     font-family: Arial, Helvetica, sans-serif;

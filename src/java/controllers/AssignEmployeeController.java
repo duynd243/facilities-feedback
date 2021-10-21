@@ -5,49 +5,32 @@
  */
 package controllers;
 
+import feedback.FeedbackDAO;
 import java.io.IOException;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Duy
  */
-@MultipartConfig
-public class MainController extends HttpServlet {
-
-    private static final String ERROR = "error.jsp";
-    private static final String LOGOUT = "LogoutController";
-    private static final String SEND_FEEDBAK = "SendFeedbackController";
-    private static final String ASSIGN_EMPLOYEE = "AssignEmployeeController";
+public class AssignEmployeeController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html; charset=UTF-8");
-        String url = ERROR;
+        response.setContentType("text/html;charset=UTF-8");
+        String feedbackID = request.getParameter("feedbackID");
+        String handlerEmail = request.getParameter("handlerEmail");
+
+        FeedbackDAO dao = new FeedbackDAO();
         try {
-            String action = request.getParameter("action");
-            if ("Log out".equals(action)) {
-                url = LOGOUT;
-            } else if ("Send".equals(action)) {
-                url = SEND_FEEDBAK;
-            } else if ("AssignEmployee".equals(action)) {
-                url = ASSIGN_EMPLOYEE;
-            } else {
-                HttpSession session = request.getSession();
-                session.setAttribute("ERROR_MESSAGE", "Function is not avaiable");
-            }
+            dao.assignEmployee(feedbackID, handlerEmail);
         } catch (Exception e) {
-            log("Error at MainController:" + e.toString());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
         }
+        response.sendRedirect("manager.jsp?status=assign-success&feedbackID=" + feedbackID);
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
