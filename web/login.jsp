@@ -35,7 +35,7 @@
                 console.log('Image URL: ' + profile.getImageUrl());
                 console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
 
-                var redirectUrl = 'LoginController';
+                var redirectUrl = 'login';
                 var form = $('<form action="' + redirectUrl + '" method="post">' +
                         '<input type="text" name="id_token" value="' +
                         googleUser.getAuthResponse().id_token + '" />' +

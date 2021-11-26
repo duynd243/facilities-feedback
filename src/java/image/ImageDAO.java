@@ -83,4 +83,68 @@ public class ImageDAO {
         }
         return list;
     }
+
+    public void insertReportImages(ArrayList<ImageDTO> imagesList) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                String sql = "insert into tblReportImages (imageURL, reportID) values(?, ?)";
+                for (ImageDTO image : imagesList) {
+                    ps = conn.prepareStatement(sql);
+                    ps.setString(1, image.getImageURL());
+                    ps.setString(2, image.getFeedbackID());
+                    ps.executeUpdate();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    public ArrayList<ImageDTO> getReportImagesList(String reportID) throws SQLException {
+        ArrayList<ImageDTO> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                String sql = "select * from tblReportImages where reportID = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, reportID);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    int imageID = rs.getInt("imageID");
+                    String imageURL = rs.getString("imageURL");
+                    list.add(new ImageDTO(imageID, imageURL, reportID));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+        return list;
+    }
 }

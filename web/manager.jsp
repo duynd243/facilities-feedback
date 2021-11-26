@@ -4,6 +4,10 @@
     Author     : Duy
 --%>
 
+<%@page import="report.ReportDTO"%>
+<%@page import="report.ReportDAO"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="utils.DeleteReasonsUtils"%>
 <%@page import="department.DepartmentDTO"%>
 <%@page import="department.DepartmentDAO"%>
 <%@page import="googleuser.GoogleUserDAO"%>
@@ -21,6 +25,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <% GoogleUserDTO loggedInUser = (GoogleUserDTO) session.getAttribute("LOGGED_IN_USER"); %>
+<% ReportDAO repDAO = new ReportDAO();%>
 <% FacilityDAO facilityDAO = new FacilityDAO();%>
 <% FeedbackDAO feedbackDAO = new FeedbackDAO();%>
 <% GoogleUserDAO userDAO = new GoogleUserDAO();%>
@@ -64,16 +69,16 @@
 <% String current = request.getParameter("page");%>
 
 <% if ("pending".equalsIgnoreCase(section)) {
-        currentPageList1 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfPendingFeedbacks));
+        currentPageList1 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfFeedbackPages(numOfPendingFeedbacks));
     }%>
 <% if ("processing".equalsIgnoreCase(section)) {
-        currentPageList2 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfProcessingFeedbacks));
+        currentPageList2 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfFeedbackPages(numOfProcessingFeedbacks));
     }%>
 <% if ("waiting".equalsIgnoreCase(section)) {
-        currentPageList3 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfWaitingFeedbacks));
+        currentPageList3 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfFeedbackPages(numOfWaitingFeedbacks));
     }%>
 <% if ("completed".equalsIgnoreCase(section)) {
-        currentPageList4 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfCompletedFeedbacks));
+        currentPageList4 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfFeedbackPages(numOfCompletedFeedbacks));
     }%>
 
 <% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackForManager(1, currentPageList1); %>
@@ -101,6 +106,17 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500&display=swap" rel="stylesheet">
+
+
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+
+
+
+        <link rel="stylesheet" href="css/checkbox.css">
         <link rel="stylesheet" href="css/style-manager.css">
         <link rel="stylesheet" href="css/toast.css">
         <script src="js/toast.js"></script>
@@ -126,6 +142,51 @@
                 });
             }
 
+            function showDeleteSuccessToast() {
+                toast({
+                    title: "Success!",
+                    message: "Feedback has been deleted.",
+                    type: "success",
+                    duration: 5000
+                });
+            }
+
+            function showChangeDepartmentSuccessToast() {
+                toast({
+                    title: "Success!",
+                    message: "Department has been changed.",
+                    type: "success",
+                    duration: 5000
+                });
+            }
+
+            function showChangeDepartmentFailedToast() {
+                toast({
+                    title: "Failed!",
+                    message: "Employee has uncompleted feedbacks.",
+                    type: "error",
+                    duration: 5000
+                });
+            }
+
+            function showBlockSuccessToast() {
+                toast({
+                    title: "Success!",
+                    message: "User has been blocked.",
+                    type: "success",
+                    duration: 5000
+                });
+            }
+
+            function showUnblockSuccessToast() {
+                toast({
+                    title: "Success!",
+                    message: "User has been unblocked.",
+                    type: "success",
+                    duration: 5000
+                });
+            }
+
             window.onload = function onloadFunction() {
 
                 var urlParams = new URLSearchParams(window.location.search);
@@ -134,6 +195,10 @@
                 if (status == 'assign-success') {
                     selectFeedbackCategory('f2', 'processing-content');
                     showAssignSuccessToast();
+                }
+
+                if (status == 'delete-success') {
+                    showDeleteSuccessToast();
                 }
 
                 var section = urlParams.get('section');
@@ -146,12 +211,60 @@
                 } else if (section == 'pending') {
                     selectFeedbackCategory('f1', 'pending-content');
                 }
+
+                var employeeMenu = document.getElementById('EmployeeMenu');
+                if (employeeMenu.value == 'true') {
+                    selectSidebarMenu('m2', 'users')
+                }
+
+                var userMenu = document.getElementById('UserMenu');
+                if (userMenu.value == 'true') {
+                    selectSidebarMenu('m2', 'users');
+                    selectUserCategory('u2', 'normal-users');
+                }
+
+                var changeDepartment = urlParams.get('change-department');
+                if (changeDepartment !== null) {
+                    selectSidebarMenu('m2', 'users');
+                    if (changeDepartment == 'success') {
+                        showChangeDepartmentSuccessToast();
+                    } else if (changeDepartment == 'failed') {
+                        showChangeDepartmentFailedToast();
+                    }
+                }
+
+                if (urlParams.get('block') == 'success') {
+                    selectSidebarMenu('m2', 'users');
+                    selectUserCategory('u2', 'normal-users');
+                    showBlockSuccessToast();
+                }
+
+                if (urlParams.get('unblock') == 'success') {
+                    selectSidebarMenu('m2', 'users');
+                    selectUserCategory('u2', 'normal-users');
+                    showUnblockSuccessToast();
+                }
+                if (urlParams.get('status') == 'approve-success') {
+                    selectFeedbackCategory('f4', 'completed-content');
+                }
+
             }
         </script>
     </head>
     <body>
         <div id="toast"></div>
         <div style="display: none" class="g-signin2" data-onsuccess="onSignIn" data-prompt="select_account"></div>
+        <% if (request.getAttribute("LIST_SEARCHED_EMPLOYEE") != null) {%>
+        <input type="hidden" id="EmployeeMenu" value="true">
+        <%} else { %>
+        <input type="hidden" id="EmployeeMenu" value="false">
+        <%}%>
+
+        <% if (request.getAttribute("LIST_SEARCHED_USER") != null) {%>
+        <input type="hidden" id="UserMenu" value="true">
+        <%} else { %>
+        <input type="hidden" id="UserMenu" value="false">
+        <%}%>
 
         <header>
             <div class="header-left">
@@ -226,6 +339,18 @@
                         document.getElementById(id).className += " cate-active";
                     }
 
+                    function selectUserCategory(id, item) {
+                        var i;
+                        var x = document.getElementsByClassName("users-category-content");
+                        for (i = 0; i < x.length; i++) {
+                            x[i].style.display = "none";
+                        }
+                        document.getElementById(item).style.display = "block";
+                        var current = document.getElementsByClassName("users-cate-active");
+                        current[0].className = current[0].className.replace(" users-cate-active", "");
+                        document.getElementById(id).className += " users-cate-active";
+                    }
+
 
                 </script>
 
@@ -246,9 +371,9 @@
                 <div class="buttons">
                     <button class="sbbutton sbbutton-active" id="m1" onclick="selectSidebarMenu(this.id, 'feedback')"><i
                             class="material-icons">format_list_bulleted</i>Feedbacks</button>
-                    <button class="sbbutton" id="m2" onclick="selectSidebarMenu(this.id, 'sent-feedback')"><i
+                    <button class="sbbutton" id="m2" onclick="selectSidebarMenu(this.id, 'users')"><i
                             class="material-icons-outlined">account_circle</i>Users</button>
-                    <button class="sbbutton" id="m3" onclick="selectSidebarMenu(this.id, 'sent-feedback')"><i
+                    <button class="sbbutton" id="m3" onclick="selectSidebarMenu(this.id, 'dashboard')"><i
                             class="material-icons-outlined">insert_chart_outlined</i>Dashboard</button>
                 </div>
             </div>
@@ -305,10 +430,17 @@
                                     <i class="material-icons-outlined">chevron_left</i>
                                     Back
                                 </div>
-                                <button id="fbp-assign-btn" onclick="openModal('<%=f.getFeedbackID().trim()%>')" class="fbp-assign-btn">
-                                    <span class="material-icons-outlined" style="margin-right: 10px">task_alt</span>
-                                    Assign to employee
-                                </button>
+
+                                <div class="fbp-action-btn" style="display: flex;">
+                                    <button id="fbp-delete-btn" class="fbp-btn fbp-delete-btn" onclick="openDeleteModal('<%=f.getFeedbackID().trim()%>', '<%=f.getSenderEmail().trim()%>')">
+                                        <span class="material-icons-outlined" style="margin-right: 10px">delete</span>
+                                        Delete
+                                    </button>
+                                    <button id="fbp-assign-btn" class="fbp-btn fbp-assign-btn" onclick="openAssignModal('<%=f.getFeedbackID().trim()%>')">
+                                        <span class="material-icons-outlined" style="margin-right: 10px">task_alt</span>
+                                        Assign to employee
+                                    </button>
+                                </div>
                             </div>
                             <h1 class="fbp-title"><%=f.getTitle().trim()%></h1>
 
@@ -357,7 +489,7 @@
                         } else { %> 
                         <div class="empty-feedback"
                              style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
-                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+                            <img width="480px" src="images/empty.jpg">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
                                 There are no feedbacks for this section.</p>
 
@@ -373,7 +505,7 @@
                             <%numOfFeedbacks = numOfPendingFeedbacks; %>
                             <%pageSection = "pending"; %>
 
-                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+                            <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 1) { %>
 
                             <div class="pagination" id="pagination1">
 
@@ -381,19 +513,19 @@
                                 <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
                                 <%}%>    
 
-                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
-                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
                                 <button><a href="manager.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
                                     <% } %>    
                                     <% } %>
-                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
-                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+                                    <% } else if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
 
 
-                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% for (int i = PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
@@ -427,8 +559,8 @@
                                 <% } %>
 
 
-                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
-                                <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%if (currentPageList != PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)%>'">last_page</i> 
                                 <%}%>
                             </div>
                             <%}%>
@@ -462,9 +594,22 @@
                         </div>
 
                         <div id="<%=f.getFeedbackID().trim()%>" class="feeback-post" style="display: none;">
-                            <div onclick="wayBack('<%=feedbackID%>', 'processing-item', 'pagination2')" class="fbp-back">
-                                <i class="material-icons-outlined">chevron_left</i>
-                                Back
+                            <div style="display: flex; align-items: flex-start; justify-content: space-between">
+                                <div onclick="wayBack('<%=feedbackID%>', 'processing-item', 'pagination2')" class="fbp-back">
+                                    <i class="material-icons-outlined">chevron_left</i>
+                                    Back
+                                </div>
+                                <div class="fbp-handler">
+                                    <span class="material-icons" style="color: #24ab4e">check_circle</span>
+                                    <div>
+                                        <span style="font-weight: 600;">
+                                            Assigned to<br>
+                                        </span>
+                                        <span>
+                                            <%=f.getHandlerEmail().trim()%>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
 
                             <h1 class="fbp-title"><%=f.getTitle().trim()%></h1>
@@ -514,7 +659,8 @@
                         } else { %> 
                         <div class="empty-feedback"
                              style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
-                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+
+                            <img width="480px" src="images/empty.jpg">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
                                 There are no feedbacks for this section.</p>
 
@@ -530,7 +676,7 @@
                             <%numOfFeedbacks = numOfProcessingFeedbacks; %>
                             <%pageSection = "processing"; %>
 
-                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+                            <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 1) { %>
 
                             <div class="pagination" id="pagination2">
 
@@ -538,19 +684,19 @@
                                 <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
                                 <%}%>    
 
-                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
-                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
                                 <button><a href="manager.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
                                     <% } %>    
                                     <% } %>
-                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
-                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+                                    <% } else if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
 
 
-                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% for (int i = PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
@@ -584,8 +730,8 @@
                                 <% } %>
 
 
-                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
-                                <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%if (currentPageList != PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)%>'">last_page</i> 
                                 <%}%>
                             </div>
                             <%}%>
@@ -623,7 +769,11 @@
                                 <i class="material-icons-outlined">chevron_left</i>
                                 Back
                             </div>
+                            <div class="view-report-container">
 
+                                <span><span style="font-weight: 500;"><%=f.getHandlerEmail()%></span> sent a report at <%=TimeUtils.renderedTime(repDAO.getReport(feedbackID).getTime())%></span>
+                                <button class="view-btn" onclick="openViewReportModal('viewReport-<%=repDAO.getReport(feedbackID).getReportID()%>')">View report</button>
+                            </div>   
                             <h1 class="fbp-title"><%=f.getTitle().trim()%></h1>
 
                             <div class="fbp-aftertitle">
@@ -671,7 +821,7 @@
                         } else { %> 
                         <div class="empty-feedback"
                              style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
-                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+                            <img width="480px" src="images/empty.jpg">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
                                 There are no feedbacks for this section.</p>
 
@@ -687,7 +837,7 @@
                             <%numOfFeedbacks = numOfWaitingFeedbacks; %>
                             <%pageSection = "waiting"; %>
 
-                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+                            <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 1) { %>
 
                             <div class="pagination" id="pagination3">
 
@@ -695,19 +845,19 @@
                                 <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
                                 <%}%>    
 
-                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
-                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
                                 <button><a href="manager.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
                                     <% } %>    
                                     <% } %>
-                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
-                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+                                    <% } else if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
 
 
-                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% for (int i = PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
@@ -741,8 +891,8 @@
                                 <% } %>
 
 
-                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
-                                <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%if (currentPageList != PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)%>'">last_page</i> 
                                 <%}%>
                             </div>
                             <%}%>
@@ -779,6 +929,7 @@
                                 <i class="material-icons-outlined">chevron_left</i>
                                 Back
                             </div>
+                                
                             <h1 class="fbp-title"><%=f.getTitle().trim()%></h1>
 
                             <div class="fbp-aftertitle">
@@ -826,7 +977,7 @@
                         } else { %> 
                         <div class="empty-feedback"
                              style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
-                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+                            <img width="480px" src="images/empty.jpg">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
                                 There are no feedbacks for this section.</p>
 
@@ -842,7 +993,7 @@
                             <%numOfFeedbacks = numOfCompletedFeedbacks; %>
                             <%pageSection = "completed"; %>
 
-                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+                            <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 1) { %>
 
                             <div class="pagination" id="pagination4">
 
@@ -850,19 +1001,19 @@
                                 <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
                                 <%}%>    
 
-                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
-                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
                                 <button><a href="manager.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
                                     <% } %>    
                                     <% } %>
-                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
-                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+                                    <% } else if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
 
 
-                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% for (int i = PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
@@ -896,8 +1047,8 @@
                                 <% } %>
 
 
-                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
-                                <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%if (currentPageList != PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'manager.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)%>'">last_page</i> 
                                 <%}%>
                             </div>
                             <%}%>
@@ -909,9 +1060,426 @@
 
 
                 </div>
-                <div class="sbcontent" id="sent-feedback" style="display: none;">
-                    hehe
 
+                <div class="sbcontent" id="users" style="display: none;">
+                    <%ArrayList<GoogleUserDTO> listSearchedEmployee = new ArrayList<>();%>
+                    <% if (request.getAttribute("LIST_SEARCHED_EMPLOYEE") != null) {
+                            listSearchedEmployee = (ArrayList<GoogleUserDTO>) request.getAttribute("LIST_SEARCHED_EMPLOYEE");
+                        } else {
+                            listSearchedEmployee = userDAO.getListEmployee("", 0, 1);
+                        }%>
+
+                    <%int searchedEmployeePageNumber = (request.getAttribute("SEARCH_EMPLOYEE_PAGENUM") != null) ? (int) request.getAttribute("SEARCH_EMPLOYEE_PAGENUM") : 1;%>
+                    <%String searchedEmployeeKeyword = (request.getAttribute("SEARCH_EMPLOYEE_KEYWORD") != null) ? (String) request.getAttribute("SEARCH_EMPLOYEE_KEYWORD") : "";%>
+                    <%int searchedEmployeeDepID = (request.getAttribute("SEARCH_EMPLOYEE_DEPARMENT") != null) ? (int) request.getAttribute("SEARCH_EMPLOYEE_DEPARMENT") : 0;%>
+
+
+                    <%ArrayList<GoogleUserDTO> listSearchedUser = new ArrayList<>();%>
+                    <% if (request.getAttribute("LIST_SEARCHED_USER") != null) {
+                            listSearchedUser = (ArrayList<GoogleUserDTO>) request.getAttribute("LIST_SEARCHED_USER");
+                        } else {
+                            listSearchedUser = userDAO.getListUser("", -1, 1);
+                        }%>
+
+                    <%int searchedUserPageNumber = (request.getAttribute("SEARCH_USER_PAGENUM") != null) ? (int) request.getAttribute("SEARCH_USER_PAGENUM") : 1;%>
+                    <%String searchedUserKeyword = (request.getAttribute("SEARCH_USER_KEYWORD") != null) ? (String) request.getAttribute("SEARCH_USER_KEYWORD") : "";%>
+                    <%int searchedUserStatusID = (request.getAttribute("SEARCH_USER_STATUSID") != null) ? (int) request.getAttribute("SEARCH_USER_STATUSID") : -1;%>
+
+
+                    <%int totalEmployee = userDAO.TotalEmployee(searchedEmployeeKeyword, searchedEmployeeDepID);%>
+                    <%int totalUser = userDAO.TotalUser(searchedUserKeyword, searchedUserStatusID);%>
+                    <!-- CATEGORY BAR -->
+                    <div class="users-category-bar">
+                        <button id="u1" class="users-category users-cate-active"
+                                onclick="selectUserCategory(id, 'employee-users')">
+                            <span class="material-icons-outlined" style="margin-right: 10px;">
+                                badge
+                            </span>
+                            Employee
+                            <div class="badge-num"><%=totalEmployee%></div>
+                        </button>
+                        <button id="u2" class="users-category"
+                                onclick="selectUserCategory(id, 'normal-users')">
+                            <span class="material-icons-outlined" style="margin-right: 10px;">
+                                account_circle
+                            </span>
+                            User<div class="badge-num"><%=totalUser%></div>
+                        </button>
+
+                    </div>
+
+
+                    <div class="users-category-content" id="employee-users">
+
+                        <!-- SEARCH - ADD -->
+                        <div class="search-add">
+                            <form action="MainController" method="POST">
+                                <div class="search-employee">
+
+                                    <select name="depID">
+                                        <option value="0">All department</option>
+                                        <% ArrayList<DepartmentDTO> depList = depDAO.getListDepartment(); %>
+                                        <% for (DepartmentDTO dep : depList) {%>
+                                        <%if (searchedEmployeeDepID == dep.getDepID()) {%>
+                                        <option value="<%=dep.getDepID()%>" selected="selected"><%=dep.getDepName().trim()%></option>
+                                        <%} else {%>
+                                        <option value="<%=dep.getDepID()%>"><%=dep.getDepName().trim()%></option>
+                                        <%}
+                                            }%>
+                                    </select>
+                                    <%if (!searchedEmployeeKeyword.isEmpty()) {%>
+                                    <input name="keyword" type="text" value="<%=searchedEmployeeKeyword%>">
+                                    <%} else { %>
+                                    <input name="keyword" type="text" placeholder="Search employee ...">
+                                    <%}%>
+                                    <input name="pageNumber" type="hidden" value="1">
+                                    <button name="action" value="SearchEmployee" type="submit" class="search-btn"><span class="material-icons-outlined"
+                                                                                                                        id="search-ico">search</span></button>
+
+                                </div>
+                            </form>
+                            <div class="add-employee">
+                                <button>
+                                    <span class="material-icons-outlined" style="font-size: 16px;">
+                                        add
+                                    </span>
+                                    Add new employee
+                                </button>
+                            </div>
+                        </div>
+                        <!-- USER LIST -->
+
+
+                        <%if (listSearchedEmployee.size() == 0) {%>
+                        <div class="no-result">
+                            <img src="images/no-result.png">
+                            <span>Sorry, no any matches for '<%=searchedEmployeeKeyword%>'</span>
+                        </div>
+                        <%} else { %>
+                        <div class="employee-item-container">
+                            <% for (GoogleUserDTO emp : listSearchedEmployee) {%>
+                            <div class="employee-item">
+                                <div class="employee-pic">
+                                    <img src="<%=emp.getPicture()%>"
+                                         alt="" srcset="">
+                                </div>
+                                <div class="employee-name-email">
+                                    <div style="font-weight: 550; opacity: 0.85;"><%=emp.getName().trim()%></div>
+                                    <div style="opacity: 0.7;"><%=emp.getEmail().trim()%></div>
+                                </div>
+                                <div class="employee-department">
+                                    <span><%=depDAO.getDepartmentName(emp.getDepID()).trim()%></span>
+                                </div>
+                                <div class="employee-rating">
+
+                                    <% float empRate = emp.getRate(); %>
+                                    <% for (int i = 1; i <= (int) empRate; i++) { %>
+                                    <span class="material-icons-outlined">
+                                        star
+                                    </span>
+                                    <% } %>
+                                    <% if ((empRate - (int) empRate) < 0.5) { %>
+                                    <% for (int i = 1; i <= 5 - (int) empRate; i++) { %>
+                                    <span class="material-icons-outlined">
+                                        grade
+                                    </span>
+                                    <% } %>
+
+                                    <% } else if ((empRate - (int) empRate) == 0.5) { %>
+                                    <span class="material-icons-outlined">
+                                        star_half
+                                    </span>
+                                    <% for (int i = 1; i <= 5 - (int) empRate - 1; i++) { %>
+                                    <span class="material-icons-outlined">
+                                        grade
+                                    </span>
+                                    <% } %>
+
+                                    <% } else if ((empRate - (int) empRate) > 0.5) { %>
+                                    <span class="material-icons-outlined">
+                                        star
+                                    </span>
+                                    <% for (int i = 1; i <= 5 - (int) empRate - 1; i++) { %>
+                                    <span class="material-icons-outlined">
+                                        grade
+                                    </span>
+                                    <% } %>
+                                    <%}%>
+                                </div>
+                                <div class="employee-changedep-btn">
+                                    <button style="display: flex; align-items: center; gap: 4px;" onclick="openChangeDepModal('changeDepModal-<%=emp.getEmail().trim()%>')">
+                                        <span class="material-icons-outlined">
+                                            autorenew
+                                        </span>
+                                        Change department</button>
+                                </div>
+                            </div>
+                            <%}%>
+                        </div>
+                        <%}%>
+
+                        <!-- PHÂN TRANG -->
+                        <div class="pagination-container">
+
+                            <% currentPageList = searchedEmployeePageNumber;%>
+                            <% int numOfEmployees = totalEmployee; %>
+
+                            <% if (PaginationUtils.getNumOfUserPages(numOfEmployees) > 1) {%>
+                            <form action="MainController" id="SearchEmployeeForm" method = "POST">
+                                <input id="EmployeePageNumber" type="hidden" name="pageNumber" value="">
+                                <input type="hidden" name="depID" value="<%=searchedEmployeeDepID%>">
+                                <input type="hidden" name="keyword" value="<%=searchedEmployeeKeyword%>">
+                                <input type="hidden" name="action" value="SearchEmployee">
+
+                            </form>
+                            <div class="pagination">
+
+                                <%if (currentPageList != 1) {%>
+                                <i class="material-icons" id="page-navigation" value="1" onclick="LoadEmployee(this)">first_page</i> 
+                                <%}%> 
+
+                                <% if (PaginationUtils.getNumOfUserPages(numOfEmployees) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfUserPages(numOfEmployees); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button value="<%=i%>" onclick="LoadEmployee(this)"><%=i%></button>
+                                <% } %>    
+                                <% } %>
+                                <% } else if (PaginationUtils.getNumOfUserPages(numOfEmployees) > 5) { %>
+                                <%if (PaginationUtils.getNumOfUserPages(numOfEmployees) - (currentPageList + 2) < 0) {%>
+
+
+                                <% for (int i = PaginationUtils.getNumOfUserPages(numOfEmployees) - 5 + 1; i <= PaginationUtils.getNumOfUserPages(numOfEmployees); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button value="<%=i%>" onclick="LoadEmployee(this)"><%=i%></button>
+                                <% } %>    
+                                <% } %>
+
+                                <% } else if (currentPageList - 2 <= 0) {%>
+
+                                <% for (int i = 1; i <= 5; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button value="<%=i%>" onclick="LoadEmployee(this)"><%=i%></button>
+                                <% } %>    
+                                <% } %>    
+
+                                <%} else {%> 
+
+
+                                <% for (int i = currentPageList - 2; i <= currentPageList + 2; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button value="<%=i%>" onclick="LoadEmployee(this)"><%=i%></button>
+                                <% } %>    
+                                <% } %>      
+
+
+                                <%}%>
+                                <% } %>
+
+
+                                <%if (currentPageList != PaginationUtils.getNumOfUserPages(numOfEmployees)) {%>
+                                <i class="material-icons" id="page-navigation" value="<%=PaginationUtils.getNumOfUserPages(numOfEmployees)%>" onclick="LoadEmployee(this)">last_page</i> 
+                                <%}%>
+                            </div>
+                            <%}%>
+                        </div>
+                        <!--PHÂN TRANG-->
+                        <script>
+                            function LoadEmployee(param) {
+                                var page = param.getAttribute("value");
+                                document.getElementById('EmployeePageNumber').value = page;
+                                document.getElementById('SearchEmployeeForm').submit();
+                            }
+                        </script>
+
+                    </div>
+                    <div class="users-category-content" id="normal-users" style="display: none;">
+                        <!-- SEARCH - ADD -->
+                        <div class="search-add">
+                            <form action="MainController" method="POST">
+                                <div class="search-user">
+                                    <select name="block-status">
+                                        <%if (searchedUserStatusID == -1) {%>
+                                        <option value="-1" selected="selected">All status</option>
+                                        <option value="1">Active</option>
+                                        <option value="0">Blocked</option>
+                                        <%} else if (searchedUserStatusID == 1) {%>
+                                        <option value="-1">All status</option>
+                                        <option value="1" selected="selected">Active</option>
+                                        <option value="0">Blocked</option>
+                                        <%} else if (searchedUserStatusID == 0) {%>
+                                        <option value="-1">All status</option>
+                                        <option value="1">Active</option>
+                                        <option value="0" selected="selected">Blocked</option>
+                                        <%}%>
+                                    </select>
+                                    <%if (!searchedUserKeyword.isEmpty()) {%>
+                                    <input name="keyword" type="text" value="<%=searchedUserKeyword%>">
+                                    <%} else { %>
+                                    <input name="keyword" type="text" placeholder="Search user ...">
+                                    <%}%>
+                                    <input name="pageNumber" type="hidden" value="1">
+                                    <button name="action" value="SearchUser" type="submit" class="search-btn"><span class="material-icons-outlined"
+                                                                                                                    id="search-ico">search</span></button>
+
+                                </div>
+                            </form>
+
+                        </div>
+                        <!-- USER LIST -->
+                        <%if (listSearchedUser.size() == 0) {%>
+                        <div class="no-result">
+                            <img src="images/no-result.png">
+                            <span>Sorry, no any matches for '<%=searchedEmployeeKeyword%>'</span>
+                        </div>
+                        <%} else { %>
+
+                        <div class="user-item-container">
+                            <% for (GoogleUserDTO user : listSearchedUser) {%>
+                            <div class="user-item">
+                                <div class="user-pic">
+                                    <img src="<%=user.getPicture().trim()%>"
+                                         alt="" srcset="">
+                                </div>
+                                <div class="user-name-email">
+                                    <div style="font-weight: 550; opacity: 0.85;"><%=user.getName().trim()%></div>
+                                    <div style="opacity: 0.7;"><%=user.getEmail().trim()%></div>
+                                </div>
+                                <div class="user-total-sent">
+                                    <span>Sent feedbacks: <%=feedbackDAO.getNumOfFeedbacksOfSender(user, 1)%></span>
+                                </div>
+                                <div class="user-status">
+                                    <%if (user.getStatusID() == 0) {%>
+                                    <div style="background: #d14d4d;">
+                                        <span class="material-icons-outlined" style="font-size: 20px;">
+                                            block
+                                        </span>
+                                        <span style="font-size: 16px;">Blocked</span>
+                                    </div>
+                                    <%} else if (user.getStatusID() == 1) { %>
+                                    <div style="background: #61c14a;">
+                                        <span class="material-icons-outlined" style="font-size: 20px;">
+                                            done
+                                        </span>
+                                        <span style="font-size: 16px;">Active</span>
+                                    </div>
+                                    <%}%>
+                                </div>
+                                <div class="user-btn">
+
+                                    <%if (user.getStatusID() == 0) {%>
+                                    <form action="MainController" onsubmit="return confirm('Do you really want to unblock <%=user.getName()%>?')">
+                                        <input type="hidden" value="<%=user.getEmail().trim()%>" name="email-to-unblock">
+                                        <button type="submit" name="action" value="UnblockUser" style="color: #39ac2d;">
+                                            Unblock</button>
+                                    </form>
+                                    <%} else if (user.getStatusID() == 1) {%>
+                                    <form action="MainController" onsubmit="return confirm('Do you really want to block <%=user.getName()%>?')">
+                                        <input type="hidden" value="<%=user.getEmail().trim()%>" name="email-to-block">
+                                        <button type="submit" name="action" value="BlockUser" style="color: #e02828;">
+                                            Block</button>
+                                    </form>
+                                    <%}%>
+
+                                </div>
+                            </div>
+                            <%}%>
+                        </div>
+                        <%} %>
+
+                        <!-- PHÂN TRANG -->
+                        <div class="pagination-container">
+
+                            <% currentPageList = searchedUserPageNumber;%>
+                            <% int numOfUsers = totalUser; %>
+
+                            <% if (PaginationUtils.getNumOfUserPages(numOfUsers) > 1) {%>
+                            <form action="MainController" id="SearchUserForm" method = "POST">
+                                <input id="UserPageNumber" type="hidden" name="pageNumber" value="">
+                                <input type="hidden" name="block-status" value="<%=searchedUserStatusID%>">
+                                <input type="hidden" name="keyword" value="<%=searchedUserKeyword%>">
+                                <input type="hidden" name="action" value="SearchUser">
+
+                            </form>
+                            <div class="pagination">
+
+                                <%if (currentPageList != 1) {%>
+                                <i class="material-icons" id="page-navigation" value="1" onclick="LoadUser(this)">first_page</i> 
+                                <%}%> 
+
+                                <% if (PaginationUtils.getNumOfUserPages(numOfUsers) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfUserPages(numOfUsers); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button value="<%=i%>" onclick="LoadUser(this)"><%=i%></button>
+                                <% } %>    
+                                <% } %>
+                                <% } else if (PaginationUtils.getNumOfUserPages(numOfUsers) > 5) { %>
+                                <%if (PaginationUtils.getNumOfUserPages(numOfUsers) - (currentPageList + 2) < 0) {%>
+
+
+                                <% for (int i = PaginationUtils.getNumOfUserPages(numOfUsers) - 5 + 1; i <= PaginationUtils.getNumOfUserPages(numOfUsers); i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button value="<%=i%>" onclick="LoadUser(this)"><%=i%></button>
+                                <% } %>    
+                                <% } %>
+
+                                <% } else if (currentPageList - 2 <= 0) {%>
+
+                                <% for (int i = 1; i <= 5; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button value="<%=i%>" onclick="LoadUser(this)"><%=i%></button>
+                                <% } %>    
+                                <% } %>    
+
+                                <%} else {%> 
+
+
+                                <% for (int i = currentPageList - 2; i <= currentPageList + 2; i++) { %>
+                                <% if (currentPageList == i) {%>
+                                <button class="active-page"><%=i%></button>
+                                <% } else {%>
+                                <button value="<%=i%>" onclick="LoadUser(this)"><%=i%></button>
+                                <% } %>    
+                                <% } %>      
+
+
+                                <%}%>
+                                <% } %>
+
+
+                                <%if (currentPageList != PaginationUtils.getNumOfUserPages(numOfUsers)) {%>
+                                <i class="material-icons" id="page-navigation" value="<%=PaginationUtils.getNumOfUserPages(numOfUsers)%>" onclick="LoadUser(this)">last_page</i> 
+                                <%}%>
+                            </div>
+                            <%}%>
+                        </div>
+                        <!--PHÂN TRANG-->
+                        <script>
+                            function LoadUser(param) {
+                                var page = param.getAttribute("value");
+                                document.getElementById('UserPageNumber').value = page;
+                                document.getElementById('SearchUserForm').submit();
+                            }
+                        </script>
+                    </div>
+
+                </div>
+
+                <div class="sbcontent" id="dashboard" style="display: none;">
+                    Dashboard
                 </div>
             </div>
 
@@ -939,23 +1507,28 @@
             </div>
 
         </footer>
-        <div class="modal">
+        <div class="modal" id="modal-assign">
             <div class="modal-assign-employee">
                 <div class="modal-department">
-                    <div class="modal-close-icon"><span id="modal-close-icon" class="material-icons-outlined">
+                    <div style="display: flex; justify-content: flex-end;"><span id="modal-close-icon" class="material-icons-outlined modal-close-icon">
                             close
-                        </span></div>
-                    <span class="modal-title">Select Department</span>
+                        </span>
+                    </div>
+                    <span class="modal-title">Choose Department</span>
                     <div class="department-wrapper">
 
-                        <% ArrayList<DepartmentDTO> depList = depDAO.getListDepartment(); %>
+
                         <% for (DepartmentDTO dep : depList) {%>
                         <% ArrayList<GoogleUserDTO> listEmp = userDAO.getListEmployeeByDepID(dep.getDepID());%>
                         <div class="department" onclick="showEmployee('dep<%=dep.getDepID()%>')">
                             <span><%=dep.getDepName().trim()%></span>
                             <div class="number-employees">
-                                <span style="font-size: 20px;" class="material-icons">account_circle</span>
-                                <span style="margin-left: 8px;">Employess: <%=listEmp.size()%></span>
+                                <div class="number-employees-left">
+                                    <span style="font-size: 20px;" class="material-icons">person</span>
+                                </div>
+                                <div class="number-employees-right">
+                                    <span>Employees: <%=listEmp.size()%></span>
+                                </div>
                             </div>
                         </div>
                         <%}%>
@@ -1012,6 +1585,196 @@
             </div>
         </div>
 
+        <div class="modal" id="modal-delete">
+            <div class="modal-delete-container">
+                <div class="modal-delete-content">
+
+                    <!--CLOSE BUTTON-->
+                    <div style="display: flex; justify-content: flex-end;"><span id="modal-close-icon"
+                                                                                 class="material-icons-outlined modal-close-icon">
+                            close
+                        </span>
+                    </div>
+
+                    <!--TITLE-->
+                    <span class="modal-title">Delete feedback</span>
+
+                    <!--FORM-->
+
+                    <form id="delete-form" action="MainController" method="POST">
+                        <span class="title2">Choose a reason</span>
+                        <input class="feedbackID" name="feedbackID" type="hidden" value="">
+                        <input class="blockSenderEmail" type="hidden" name="blockSenderEmail" value="">
+                        <select required id="reason-combobox" style="display: block;" name="reason"
+                                onchange="checkOtherReason()">
+                            <option value="" disabled selected>Choose one...</option>
+                            <%HashMap<Integer, String> deleteReasons = (HashMap<Integer, String>) DeleteReasonsUtils.deleteReasons;%>
+                            <% for (int key : deleteReasons.keySet()) {%>
+                            <option value="<%=key%>"><%=deleteReasons.get(key)%></option>
+                            <%}%>
+                            <option value="0">Other</option>
+                        </select>
+                        <div>
+
+                            <input id="other-reason" type="text" name="other-reason" placeholder="Enter reason..."
+                                   style="visibility: hidden; position: absolute; opacity: 0;">
+                        </div>
+
+                        <!--BLOCK USER CHECKBOX-->
+                        <label class="checkbox-container" style="margin: 40px 0 20px 0;">
+                            <span style="opacity: 0.9;">Block this user also</span>
+                            <input type="checkbox" id="blockuser-check">
+                            <span class="checkmark"></span>
+                            <input id="isChecked" type="hidden" name="block" value="false">
+
+                        </label>
+
+                        <script>
+
+                            function checkOtherReason() {
+                                var combobox = document.getElementById("reason-combobox");
+                                var str = combobox.options[combobox.selectedIndex].text;
+                                if (str == "Other") {
+                                    document.getElementById("other-reason").style.visibility = "visible";
+                                    document.getElementById("other-reason").style.position = "relative";
+                                    document.getElementById("other-reason").style.opacity = 1;
+                                    document.getElementById("other-reason").required = true;
+                                } else {
+                                    document.getElementById('other-reason').value = '';
+                                    document.getElementById("other-reason").style.visibility = "hidden";
+                                    document.getElementById("other-reason").style.position = "absolute";
+                                    document.getElementById("other-reason").style.opacity = 0;
+                                    document.getElementById("other-reason").required = false;
+                                }
+
+                            }
+                            var x = document.getElementById('blockuser-check');
+                            x.onchange = function () {
+                                document.getElementById('isChecked').value = x.checked;
+                            }
+                        </script>
+
+                        <!--BUTTONS-->
+                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                            <button class="action-btn delete-btn" type="submit" name="action" value="DeleteFeedback">Delete</button>
+                            <div id="modal-delete-close" class="action-btn cancel-btn">Cancel</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <% for (FeedbackDTO f : feedbackList3) { %>
+        <% ReportDTO r = repDAO.getReport(f.getFeedbackID().trim());%>
+        <div class="modal" id="viewReport-<%=r.getReportID()%>">
+            <div class="modal-view-report-container">
+                <div class="view-report-close" onclick="closeReportModal('viewReport-<%=r.getReportID()%>')">
+                    <span class="material-icons-outlined">
+                        close
+                    </span>
+                </div>
+                <div class="modal-view-report-content">
+
+                    <div class="images">
+                        <% ArrayList<ImageDTO> listImages = imageDAO.getReportImagesList(r.getReportID().trim()); %>
+                        <% for (ImageDTO image : listImages) {%>
+                        <img src="<%=image.getImageURL()%>">
+                        <%}%>
+
+                    </div>
+                    <span class="title">Description</span>
+                    <div class="description"><%=r.getDescription()%></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span class="title">Spent money</span>
+                        <span class="money">$<%=r.getSpentMoney()%></span>
+                    </div>
+
+                </div>
+                <div class="btn" style="display: flex; justify-content: flex-end; gap: 20px;">
+                    <button class="approve-btn" onclick="openRateModal('<%=r.getReportID()%>', '<%=f.getFeedbackID()%>', '<%=f.getHandlerEmail()%>')">Approve</button>
+                    <form action="MainController" method="POST">
+                        <input type="hidden" value="<%=r.getReportID()%>" name="reportID">
+                        <input type="hidden" value="<%=f.getFeedbackID()%>" name="feedbackID">
+                        <button class="decline-btn" name="action" value="DeclineReport">Decline</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+
+
+        <% for (GoogleUserDTO emp : listSearchedEmployee) {%>
+        <div class="modal modal-change-department" id="changeDepModal-<%=emp.getEmail().trim()%>">
+            <div class="modal-change-department-container">
+                <div class="modal-change-department-content">
+
+                    <!--CLOSE BUTTON-->
+                    <div style="display: flex; justify-content: flex-end;">
+                    </div>
+
+                    <!--TITLE-->
+                    <span class="modal-title">Change department</span>
+
+                    <!--FORM-->
+
+                    <form id="changeDepForm" action="MainController" method="POST">
+                        <input type="hidden" value="<%=emp.getEmail().trim()%>" name="email">
+                        <span class="title2">Choose a deparment</span>
+                        <select required id="department-combobox" style="display: block;" name="depID"
+                                onchange="checkOtherReason()">
+                            <option value="" disabled selected>Choose one...</option>
+
+                            <% for (DepartmentDTO dep : depList) {%>
+                            <%if (dep.getDepID() != emp.getDepID()) {%>
+                            <option value="<%=dep.getDepID()%>"><%=dep.getDepName()%></option>
+                            <%}%>        
+
+                            <%}%>
+                        </select>
+
+                        <!--BUTTONS-->
+                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                            <button class="action-btn confirm-btn" type="submit" name="action" value="ChangeDepartment">Confirm</button>
+                            <div id="modal-change-deparment-close" class="action-btn cancel-btn" onclick="CloseChangeDepModal()">Cancel</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <%}%>
+
+        <div class="modal" id="modal-rate-star">
+            <div class="modal-rate-star-container">
+                <span class="heading">Rate for employee's work</span>
+                <div class="modal-rate-star-content">
+
+                    <div class="stars">
+                        <form action="MainController" id="rate-star-form" method="POST">
+                            <input class="star star-5" id="star-5" type="radio" name="rated" value="5" required />
+                            <label class="star star-5" for="star-5"></label>
+                            <input class="star star-4" id="star-4" type="radio" name="rated" value="4" />
+                            <label class="star star-4" for="star-4"></label>
+                            <input class="star star-3" id="star-3" type="radio" name="rated" value="3" />
+                            <label class="star star-3" for="star-3"></label>
+                            <input class="star star-2" id="star-2" type="radio" name="rated" value="2" />
+                            <label class="star star-2" for="star-2"></label>
+                            <input class="star star-1" id="star-1" type="radio" name="rated" value="1" />
+                            <label class="star star-1" for="star-1"></label>
+                            <input type="hidden" value="" id="rateHandlerEmail" name="handlerEmail">
+                            <input type="hidden" value="" id="rateReportID" name="reportID">
+                            <input type="hidden" value="" id="rateFeedbackID" name="feedbackID">
+                        </form>
+
+                        <button name="action" value="RateReport" type="submit" form="rate-star-form" class="submit-btn">Submit</button>
+                        <div class="cancel-btn" onclick="closeRateModal()">Cancel</div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
 
         <script>
             function openFeedback(itemToShow, classToHide, paginationToHide) {
@@ -1061,36 +1824,111 @@
             }
 
             // Get the modal
-            var modal = document.getElementsByClassName("modal")[0];
+            var modalAssign = document.getElementById("modal-assign");
+            var modalDelete = document.getElementById("modal-delete");
 
             // Get the button that opens the modal
             var btn = document.getElementById("fbp-assign-btn");
 
             // Get the <span> element that closes the modal
-            var span = document.getElementById("modal-close-icon");
+            var closeModalBtn = document.getElementsByClassName("modal-close-icon");
+
 
             // When the user clicks the button, open the modal 
-            function openModal(feedbackID) {
-                modal.style.display = "flex";
-                
+            function openAssignModal(feedbackID) {
+                modalAssign.style.display = "flex";
                 var inputFeedbackID = document.getElementsByClassName('feedbackID');
                 for (i = 0; i < inputFeedbackID.length; i++) {
                     inputFeedbackID[i].value = feedbackID;
                 }
             }
 
-            // When the user clicks on <span> (x), close the modal
-            span.onclick = function () {
-                modal.style.display = "none";
+            function openDeleteModal(feedbackID, blockSenderEmail) {
+                modalDelete.style.display = "flex";
+                var inputFeedbackID = document.getElementsByClassName('feedbackID');
+                for (i = 0; i < inputFeedbackID.length; i++) {
+                    inputFeedbackID[i].value = feedbackID;
+                }
+
+                var inputBlockSenderEmail = document.getElementsByClassName('blockSenderEmail');
+                for (i = 0; i < inputBlockSenderEmail.length; i++) {
+                    inputBlockSenderEmail[i].value = blockSenderEmail;
+                }
             }
+
+
+            function openViewReportModal(modalId) {
+                document.getElementById(modalId).style.display = "flex";
+            }
+
+            function closeReportModal(modalId) {
+                document.getElementById(modalId).style.display = "none";
+            }
+
+            function openChangeDepModal(modalId) {
+                document.getElementById(modalId).style.display = "flex";
+            }
+
+            function openRateModal(reportId, feedbackId, handlerEmail) {
+                document.getElementById('modal-rate-star').style.display = "flex";
+                document.getElementById('rateReportID').value = reportId;
+                document.getElementById('rateFeedbackID').value = feedbackId;
+                document.getElementById('rateHandlerEmail').value = handlerEmail;
+            }
+
+            function closeRateModal() {
+                document.getElementById('modal-rate-star').style.display = "none";
+                document.getElementById('rateReportID').value = "";
+                document.getElementById('rateFeedbackID').value = "";
+                document.getElementById('rateHandlerEmail').value = "";
+            }
+
+
+
+            // When the user clicks on <span> (x), close the modal
+            for (i = 0; i < closeModalBtn.length; i++) {
+                closeModalBtn[i].onclick = function () {
+                    modalAssign.style.display = "none";
+                }
+            }
+
+            document.getElementById('modal-delete-close').onclick = function () {
+
+                modalDelete.style.display = "none";
+                // RESET COMBOBOX VALUE
+                document.getElementById('reason-combobox').selectedIndex = 0;
+
+                // HIDE AND RESET OTHER REASON INPUT 
+                document.getElementById('other-reason').value = '';
+                document.getElementById("other-reason").style.visibility = "hidden";
+                document.getElementById("other-reason").style.position = "absolute";
+                document.getElementById("other-reason").style.opacity = 0;
+                document.getElementById("other-reason").required = false;
+
+                // UNCHECK BLOCK USER CHECKBOX
+                document.getElementById('blockuser-check').checked = false;
+
+                document.getElementById('isChecked').value = false;
+
+            }
+
+            function CloseChangeDepModal() {
+                var modal = document.getElementsByClassName('modal-change-department');
+                for (i = 0; i < modal.length; i++) {
+                    modal[i].style.display = "none";
+                }
+            }
+
+
+
 
             // When the user clicks anywhere outside of the modal, close it
             /*
-            window.onclick = function (event) {
-                if (event.target == modal) {
-                    modal.style.display = "none";
-                }
-            }*/
+             window.onclick = function (event) {
+             if (event.target == modal) {
+             modal.style.display = "none";
+             }
+             }*/
         </script>
 
     </body>

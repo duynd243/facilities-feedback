@@ -12,42 +12,42 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import googleuser.GoogleUserDTO;
+import javax.servlet.annotation.WebServlet;
 
 /**
  *
  * @author Duy
  */
+@WebServlet(name = "HomeController", urlPatterns = {"/home"})
 public class HomeController extends HttpServlet {
 
     private static final String GUEST_PAGE = "landing.html";
     private static final String MANAGER_PAGE = "manager.jsp";
     private static final String EMPLOYEE_PAGE = "employee.jsp";
     private static final String USER_PAGE = "send-feedback.jsp";
+    private static final String BLOCKED_USER_PAGE = "blocked.jsp";
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
         GoogleUserDTO loggedInUser = (GoogleUserDTO) session.getAttribute("LOGGED_IN_USER");
+        String url = GUEST_PAGE;
         if (loggedInUser != null) {
             String roleID = loggedInUser.getRoleID();
 
             if ("MG".equals(roleID)) {
-                request.getRequestDispatcher(MANAGER_PAGE).forward(request, response);
+                url = MANAGER_PAGE;
             } else if ("EP".equals(roleID)) {
-                request.getRequestDispatcher(EMPLOYEE_PAGE).forward(request, response);
+                url = EMPLOYEE_PAGE;
             } else if ("US".equals(roleID)) {
-                request.getRequestDispatcher(USER_PAGE).forward(request, response);
+                if (loggedInUser.getStatusID() == 1) {
+                    url = USER_PAGE;
+                } else if (loggedInUser.getStatusID() == 0) {
+                    url = BLOCKED_USER_PAGE;
+                }
             }
+            request.getRequestDispatcher(url).forward(request, response);
         } else {
             response.sendRedirect(GUEST_PAGE);
         }

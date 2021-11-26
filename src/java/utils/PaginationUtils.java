@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utils;
 
 /**
@@ -10,8 +5,10 @@ package utils;
  * @author Duy
  */
 public class PaginationUtils {
-    public static final int ITEMS_PER_PAGE = 4;
-    
+
+    public static final int ITEMS_PER_FEEDBACK_PAGE = 4;
+    public static final int ITEMS_PER_USER_PAGE = 5;
+
     public static int isInteger(String s) {
         int num;
         try {
@@ -34,11 +31,13 @@ public class PaginationUtils {
         }
         return currentPage;
     }
-    
-    public static int getNumOfPages(int numOfItems){
-        return (int) Math.ceil(numOfItems / (double)ITEMS_PER_PAGE);
+
+    public static int getNumOfFeedbackPages(int numOfItems) {
+        return (int) Math.ceil(numOfItems / (double) ITEMS_PER_FEEDBACK_PAGE);
     }
-    
-    
-    
+
+    public static int getNumOfUserPages(int numOfItems) {
+        return (int) Math.ceil(numOfItems / (double) ITEMS_PER_USER_PAGE);
+    }
+
 }

@@ -52,6 +52,37 @@ public class DepartmentDAO {
         }
         return list;
     }
+    
+    public String getDepartmentName(int depID) throws SQLException{
+        String depName = "";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                String sql = "SELECT * FROM tblDepartments WHERE depID = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setInt(1, depID);
+                rs = ps.executeQuery();
+                if(rs.next()){
+                    depName = rs.getString("depName");
+                }
+            }
+        } catch (Exception e) {
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return depName;
+    }
 
     public HashMap<DepartmentDTO, ArrayList<GoogleUserDTO>> LoadDepartmentsAndEmployees() throws SQLException {
         HashMap<DepartmentDTO, ArrayList<GoogleUserDTO>> hm = new HashMap<>();

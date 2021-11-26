@@ -92,8 +92,9 @@ main{
     margin: 10px 0;
     padding: 10px 15px;
     border: none;
-    border-radius: 5px;
-    background-color: rgb(36, 140, 107);
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    background-color: rgb(91, 171, 99);
 }
 
 .leavefeedback:hover{

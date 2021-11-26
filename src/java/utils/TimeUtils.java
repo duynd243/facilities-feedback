@@ -22,15 +22,19 @@ public class TimeUtils {
     }
 
     public static String renderedTime(String time) {
-        StringTokenizer stk = new StringTokenizer(time);
-        String day = stk.nextToken();
-        String hour = stk.nextToken().substring(0, 8);
-        StringTokenizer stk2 = new StringTokenizer(day, "-");
-        String yyyy = stk2.nextToken();
-        String mm = stk2.nextToken();
-        String dd = stk2.nextToken();
-        day = dd + "-" + mm + "-" + yyyy;
-        time = hour + " | " + day;
+        try {
+            StringTokenizer stk = new StringTokenizer(time);
+            String day = stk.nextToken();
+            String hour = stk.nextToken().substring(0, 8);
+            StringTokenizer stk2 = new StringTokenizer(day, "-");
+            String yyyy = stk2.nextToken();
+            String mm = stk2.nextToken();
+            String dd = stk2.nextToken();
+            day = dd + "-" + mm + "-" + yyyy;
+            time = hour + " | " + day;
+        } catch (Exception e) {
+            return "null";
+        }
         return time;
     }
 

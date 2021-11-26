@@ -1,23 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package report;
 
-/**
- *
- * @author USER
- */
 public class ReportDTO {
 
-    String reportID;
-    int statusID;
-    String feedbackID;
-    String description;
-    int spentMoney;
-    String time;
-    int rated;
+    private String reportID;
+    private int statusID;
+    private String feedbackID;
+    private String description;
+    private int spentMoney;
+    private String time;
+    private int rated;
+
+    public ReportDTO(int statusID, String feedbackID, String description, int spentMoney, String time) {
+        this.statusID = statusID;
+        this.feedbackID = feedbackID;
+        this.description = description;
+        this.spentMoney = spentMoney;
+        this.time = time;
+    }
 
     public ReportDTO(String reportID, int statusID, String feedbackID, String description, int spentMoney, String time, int rated) {
         this.reportID = reportID;
@@ -27,9 +26,6 @@ public class ReportDTO {
         this.spentMoney = spentMoney;
         this.time = time;
         this.rated = rated;
-    }
-
-    public ReportDTO() {
     }
 
     public String getReportID() {
@@ -87,5 +83,6 @@ public class ReportDTO {
     public void setRated(int rated) {
         this.rated = rated;
     }
+    
 
 }

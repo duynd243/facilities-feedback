@@ -9,6 +9,7 @@ import googleuser.GoogleUserDAO;
 import googleuser.GoogleUserDTO;
 import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,50 +20,56 @@ import utils.GoogleUtils;
  *
  * @author Duy
  */
+@WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
 
     private static final String MANAGER_PAGE = "manager.jsp";
     private static final String EMPLOYEE_PAGE = "employee.jsp";
     private static final String USER_PAGE = "send-feedback.jsp";
+    private static final String BLOCKED_USER_PAGE = "blocked.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String id_token = request.getParameter("id_token");
-        GoogleUserDTO user = GoogleUtils.getUserInfo(id_token);
+        try {
+            String id_token = request.getParameter("id_token");
+            GoogleUserDTO user = GoogleUtils.getUserInfo(id_token);
 
-        if (user.getHd() != null && user.getHd().equals("fpt.edu.vn")) {
-            String url = "";
-            GoogleUserDAO userDAO = new GoogleUserDAO();
-            String roleID = "";
-            try {
+            if (user.getHd() != null && user.getHd().equals("fpt.edu.vn")) {
+                String url = "";
+                GoogleUserDAO userDAO = new GoogleUserDAO();
+                String roleID = "";
+
                 roleID = userDAO.checkLogin(user);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if ("MG".equals(roleID)) {
-                url = MANAGER_PAGE;
-            } else if ("EP".equals(roleID)) {
-                url = EMPLOYEE_PAGE;
-            } else if ("US".equals(roleID)) {
-                url = USER_PAGE;
-            } else if (roleID.isEmpty()) {
-                user.setRoleID("US");
-                try {
-                    userDAO.addNewUser(user);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                url = USER_PAGE;
-            }
 
-            HttpSession session = request.getSession();
-            session.setAttribute("LOGGED_IN_USER", user);
-            response.sendRedirect(url);
-        } else {
-            request.setAttribute("ERROR", "email");
-            request.getRequestDispatcher("login-error.jsp").forward(request, response);
+                if ("MG".equals(roleID)) {
+                    url = MANAGER_PAGE;
+                } else if ("EP".equals(roleID)) {
+                    url = EMPLOYEE_PAGE;
+                } else if ("US".equals(roleID)) {
+                    if (user.getStatusID() == 1) {
+                        url = USER_PAGE;
+                    } else if (user.getStatusID() == 0) {
+                        url = BLOCKED_USER_PAGE;
+                    }
+                } else if (roleID.isEmpty()) { // USER KHÔNG TỒN TẠI TRONG DB -> ADD VÀO DB VỚI ROLE = US
+                    user.setRoleID("US");
+                    user.setStatusID(1);
+                    userDAO.addNewUser(user);
+                    url = USER_PAGE;
+                }
+
+                HttpSession session = request.getSession();
+                session.setAttribute("LOGGED_IN_USER", user);
+                response.sendRedirect(url);
+            } else { // NOT FPT.EDU.VN EMAIL
+                request.setAttribute("ERROR", "email");
+                request.getRequestDispatcher("login-error.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
+            log("Error at LoginController");
         }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

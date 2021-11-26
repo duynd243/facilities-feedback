@@ -1,56 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-    <servlet>
-        <servlet-name>MainController</servlet-name>
-        <servlet-class>controllers.MainController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>LoginController</servlet-name>
-        <servlet-class>controllers.LoginController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>HomeController</servlet-name>
-        <servlet-class>controllers.HomeController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>LogoutController</servlet-name>
-        <servlet-class>controllers.LogoutController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>SendFeedbackController</servlet-name>
-        <servlet-class>controllers.SendFeedbackController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AssignEmployeeController</servlet-name>
-        <servlet-class>controllers.AssignEmployeeController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>MainController</servlet-name>
-        <url-pattern>/MainController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LoginController</servlet-name>
-        <url-pattern>/LoginController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>HomeController</servlet-name>
-        <url-pattern>/HomeController</url-pattern>
-    </servlet-mapping>
     <welcome-file-list>
-        <welcome-file>HomeController</welcome-file>
+        <welcome-file>home</welcome-file>
     </welcome-file-list>
-    <servlet-mapping>
-        <servlet-name>LogoutController</servlet-name>
-        <url-pattern>/LogoutController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SendFeedbackController</servlet-name>
-        <url-pattern>/SendFeedbackController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AssignEmployeeController</servlet-name>
-        <url-pattern>/AssignEmployeeController</url-pattern>
-    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

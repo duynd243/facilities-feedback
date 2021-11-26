@@ -19,7 +19,25 @@ public class FeedbackDTO {
     private String handlerEmail;
     private int roomNumber;
     private String facilityID;
+    private String assignTime;
+    private String completeTime;
     private int statusID;
+
+    public String getAssignTime() {
+        return assignTime;
+    }
+
+    public void setAssignTime(String assignTime) {
+        this.assignTime = assignTime;
+    }
+
+    public String getCompleteTime() {
+        return completeTime;
+    }
+
+    public void setCompleteTime(String completeTime) {
+        this.completeTime = completeTime;
+    }
 
     public FeedbackDTO() {
     }
@@ -33,6 +51,20 @@ public class FeedbackDTO {
         this.handlerEmail = handlerEmail;
         this.roomNumber = roomNumber;
         this.facilityID = facilityID;
+        this.statusID = statusID;
+    }
+
+    public FeedbackDTO(String feedbackID, String senderEmail, String title, String description, String sentTime, String handlerEmail, int roomNumber, String facilityID, String assignTime, String completeTime, int statusID) {
+        this.feedbackID = feedbackID;
+        this.senderEmail = senderEmail;
+        this.title = title;
+        this.description = description;
+        this.sentTime = sentTime;
+        this.handlerEmail = handlerEmail;
+        this.roomNumber = roomNumber;
+        this.facilityID = facilityID;
+        this.assignTime = assignTime;
+        this.completeTime = completeTime;
         this.statusID = statusID;
     }
 

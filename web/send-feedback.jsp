@@ -55,13 +55,13 @@
 <% String current = request.getParameter("page");%>
 
 <% if ("pending".equalsIgnoreCase(section)) {
-        currentPageList1 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfPendingFeedbacks));
+        currentPageList1 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfFeedbackPages(numOfPendingFeedbacks));
     }%>
 <% if ("processing".equalsIgnoreCase(section)) {
-        currentPageList2 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfProcessingFeedbacks));
+        currentPageList2 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfFeedbackPages(numOfProcessingFeedbacks));
     }%>
 <% if ("completed".equalsIgnoreCase(section)) {
-        currentPageList3 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfPages(numOfCompletedFeedbacks));
+        currentPageList3 = PaginationUtils.getCurrentPage(current, PaginationUtils.getNumOfFeedbackPages(numOfCompletedFeedbacks));
     }%>
 
 <% ArrayList<FeedbackDTO> feedbackList1 = (ArrayList<FeedbackDTO>) feedbackDAO.getListFeedbackOfSender(loggedInUser, 1, currentPageList1); %>
@@ -91,6 +91,7 @@
         <link rel="stylesheet" href="css/style-send-feedback.css">
         <link rel="stylesheet" href="css/toast.css">
         <script src="js/toast.js"></script>
+        
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -259,9 +260,9 @@
                             <input type="text" name="title" class="title"maxlength="150" placeholder="Enter your title here..." required>
                         </div>
 
-                        <div class="ilabel">Desciption</div>
+                        <div class="ilabel">Description</div>
                         <div style="display: flex; justify-content: center;">
-                            <textarea name="desciption" maxlength="3000" placeholder="Tell us detail problem..."
+                            <textarea name="description" maxlength="3000" placeholder="Tell us detail problem..."
                                       required></textarea>
                         </div>
                         <span id="chars-remain"></span>
@@ -279,35 +280,27 @@
                             <%}%>
                         </div>
 
-                        <div style="display: flex;">
-                            <div style="width: 50%;">
+                        <div style="display: flex; gap: 10px">
+                            <div style="width: 40%;">
                                 <div class="ilabel">Location</div>
                                 <input type="number" name="roomNumber" min="1" max="50" placeholder="Enter room number..." required>
                             </div>
 
-                            <div style="width: 50%;">
+                            <div id="upload-container">
                                 <div class="ilabel">Attach Images</div>
                                 <div style="display: flex; align-items: center;">
                                     <label for="images">
                                         <div class="upload-button"><i class="material-icons"
-                                                                      style="margin-right: 10px;">add_photo_alternate</i>
+                                                                      style="margin-right: 10px;">file_upload</i>
                                             <div>Upload your images</div>
                                         </div>
                                     </label>
                                     <input type="file" name="images" id="images" required="required" multiple="multiple"
-                                           accept="image/png, image/jpeg" />
+                                           accept="image/png, image/jpeg" style="display:none;" onchange="previewImg()"/>
+                                    <div id="preview-img"></div>
                                 </div>
-                                <script>
-                                    $(function () {
-                                        $("button[type = 'submit']").click(function () {
-                                            var $fileUpload = $("input[type='file']");
-                                            if (parseInt($fileUpload.get(0).files.length) > 2) {
-                                                alert("You are only allowed to upload a maximum of 2 images");
-                                                return false;
-                                            }
-                                        });
-                                    });
-                                </script>
+                                <div style="margin-left: 1.875vw; font-family:'Arial'; margin-top: 10px;">Up to 2 images.</div>
+                                <script src="js/img-upload.js"></script>
                             </div>
                         </div>
                         <button type="submit" class="send" name="action" value="Send">
@@ -414,7 +407,7 @@
                         } else { %> 
                         <div class="empty-feedback"
                              style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
-                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+                            <img width="480px" src="images/empty.jpg">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
                                 There are no feedbacks for this section.</p>
 
@@ -430,7 +423,7 @@
                             <%numOfFeedbacks = numOfPendingFeedbacks; %>
                             <%pageSection = "pending"; %>
 
-                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+                            <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 1) { %>
 
                             <div class="pagination" id="pagination1">
 
@@ -438,19 +431,19 @@
                                 <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
                                 <%}%>    
 
-                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
-                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
                                 <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
                                     <% } %>    
                                     <% } %>
-                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
-                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+                                    <% } else if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
 
 
-                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% for (int i = PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
@@ -484,8 +477,8 @@
                                 <% } %>
 
 
-                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
-                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%if (currentPageList != PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)%>'">last_page</i> 
                                 <%}%>
                             </div>
                             <%}%>
@@ -569,7 +562,7 @@
                         } else { %> 
                         <div class="empty-feedback"
                              style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
-                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+                            <img width="480px" src="images/empty.jpg">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
                                 There are no feedbacks for this section.</p>
 
@@ -586,7 +579,7 @@
                             <%numOfFeedbacks = numOfProcessingFeedbacks; %>
                             <%pageSection = "processing"; %>
 
-                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+                            <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 1) { %>
 
                             <div class="pagination" id="pagination2">
 
@@ -594,19 +587,19 @@
                                 <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
                                 <%}%>    
 
-                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
-                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
                                 <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
                                     <% } %>    
                                     <% } %>
-                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
-                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+                                    <% } else if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
 
 
-                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% for (int i = PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
@@ -640,8 +633,8 @@
                                 <% } %>
 
 
-                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
-                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%if (currentPageList != PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)%>'">last_page</i> 
                                 <%}%>
                             </div>
                             <%}%>
@@ -725,7 +718,7 @@
                         } else { %> 
                         <div class="empty-feedback"
                              style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 408px;">
-                            <i style="font-size: 220px; color: #ddd;" class="material-icons">inbox</i>
+                            <img width="480px" src="images/empty.jpg">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 32px;color: rgb(100, 95, 95);">
                                 There are no feedbacks for this section.</p>
 
@@ -739,7 +732,7 @@
                             <%numOfFeedbacks = numOfCompletedFeedbacks; %>
                             <%pageSection = "completed"; %>
 
-                            <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 1) { %>
+                            <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 1) { %>
 
                             <div class="pagination" id="pagination3">
 
@@ -747,19 +740,19 @@
                                 <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=1'">first_page</i> 
                                 <%}%>    
 
-                                <% if (PaginationUtils.getNumOfPages(numOfFeedbacks) <= 5) { %>
-                                <% for (int i = 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) <= 5) { %>
+                                <% for (int i = 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
                                 <button><a href="send-feedback.jsp?&section=<%=pageSection%>&page=<%=i%>"><%=i%></a></button>
                                     <% } %>    
                                     <% } %>
-                                    <% } else if (PaginationUtils.getNumOfPages(numOfFeedbacks) > 5) { %>
-                                    <%if (PaginationUtils.getNumOfPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
+                                    <% } else if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) > 5) { %>
+                                    <%if (PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - (currentPageList + 2) < 0) {%>
 
 
-                                <% for (int i = PaginationUtils.getNumOfPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfPages(numOfFeedbacks); i++) { %>
+                                <% for (int i = PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks) - 5 + 1; i <= PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks); i++) { %>
                                 <% if (currentPageList == i) {%>
                                 <button class="active-page"><%=i%></button>
                                 <% } else {%>
@@ -793,8 +786,8 @@
                                 <% } %>
 
 
-                                <%if (currentPageList != PaginationUtils.getNumOfPages(numOfFeedbacks)) {%>
-                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfPages(numOfFeedbacks)%>'">last_page</i> 
+                                <%if (currentPageList != PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)) {%>
+                                <i class="material-icons" id="page-navigation" onclick="location.href = 'send-feedback.jsp?&section=<%=pageSection%>&page=<%=PaginationUtils.getNumOfFeedbackPages(numOfFeedbacks)%>'">last_page</i> 
                                 <%}%>
                             </div>
                             <%}%>

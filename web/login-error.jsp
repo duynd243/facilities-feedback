@@ -50,9 +50,7 @@
             <div class="header-right">
                 <div style="display: none"><i class="material-icons"
                                               style=" padding-top: 5px; font-size: 26px;">notifications_none</i></div>
-                <img style="display: none"
-                     src="https://lh3.googleusercontent.com/a-/AOh14GgdqYd6L14mXAnvwSaPGdBxUkV55V3B5KwsWDx2Og=s96-c"
-                     class="profile-picture">
+               
                 <button style="display: none;" class="login-button"><a href="#"><span>Sign in</span></a></button>
             </div>
         </header>

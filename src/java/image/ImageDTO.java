@@ -14,6 +14,11 @@ public class ImageDTO {
     private String imageURL;
     private String feedbackID;
 
+    @Override
+    public String toString() {
+        return "ImageDTO{" + "imageID=" + imageID + ", imageURL=" + imageURL + ", feedbackID=" + feedbackID + '}';
+    }
+
     public ImageDTO() {
     }
 

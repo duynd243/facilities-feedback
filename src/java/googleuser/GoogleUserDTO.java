@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package googleuser;
 
 /**
@@ -17,8 +12,25 @@ public class GoogleUserDTO {
     private String roleID;
     private String hd;
     private int depID;
+    private int statusID;
+    private float rate;
 
     public GoogleUserDTO() {
+    }
+
+    public GoogleUserDTO(String email, String name, String picture, int statusID) {
+        this.email = email;
+        this.name = name;
+        this.picture = picture;
+        this.statusID = statusID;
+    }
+
+    public GoogleUserDTO(String email, String name, String picture, int depID, float rate) {
+        this.email = email;
+        this.name = name;
+        this.picture = picture;
+        this.depID = depID;
+        this.rate = rate;
     }
 
     public GoogleUserDTO(String email, String name, String picture, String roleID, String hd) {
@@ -85,9 +97,24 @@ public class GoogleUserDTO {
         this.depID = depID;
     }
 
-    @Override
-    public String toString() {
-        return "GoogleUserDTO{" + "email=" + email + ", name=" + name + ", picture=" + picture + ", roleID=" + roleID + ", hd=" + hd + ", depID=" + depID + '}';
+    public float getRate() {
+        return rate;
     }
 
+    public void setRate(float rate) {
+        this.rate = rate;
+    }
+
+    public int getStatusID() {
+        return statusID;
+    }
+
+    public void setStatusID(int statusID) {
+        this.statusID = statusID;
+    }
+
+    @Override
+    public String toString() {
+        return "GoogleUserDTO{" + "email=" + email + ", name=" + name + ", picture=" + picture + ", roleID=" + roleID + ", hd=" + hd + ", depID=" + depID + ", statusID=" + statusID + ", rate=" + rate + '}';
+    }
 }
