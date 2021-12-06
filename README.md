@@ -12,5 +12,13 @@
 
 ## Project Screenshots
 
-!(screenshots/landing.png)
+![1](screenshots/landing.png)
+![1](screenshots/send.png)
+![1](screenshots/manager1.png)
+![1](screenshots/manager2.png)
+![1](screenshots/manager3.png)
+![1](screenshots/manager4.png)
+![1](screenshots/manager5.png)
+![1](screenshots/manager6.png)
+
 
