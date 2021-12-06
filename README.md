@@ -1,7 +1,7 @@
 # FPT Facilities Feedback System
 
 ## [Live Demo](https://facilities-feedback.tech)
-#### FPTU Facilities Feedback is a website that allows FPT University's lecturers & students to send feedbacks about university's facilities.
+FPTU Facilities Feedback is a website that allows FPT University's lecturers & students to send feedbacks about university's facilities.
 
 ## Team Member
 - Nguyễn Đình Duy | Github: https://github.com/duyndse150396
