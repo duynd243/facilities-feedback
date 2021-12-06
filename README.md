@@ -12,5 +12,5 @@
 
 ## Project Screenshots
 
-![Landing Page](screenshots/landing.png)
+!(screenshots/landing.png)
 
