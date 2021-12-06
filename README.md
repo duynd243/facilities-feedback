@@ -1,6 +1,6 @@
 # FPT Facilities Feedback System
 
-## [Live Demo](https://facilies-feedback.tech)
+## [Live Demo](https://facilities-feedback.tech)
 #### FPTU Facilities Feedback is a website that allows FPT University's lecturers & students to send feedbacks about university's facilities.
 
 ## Team Member
