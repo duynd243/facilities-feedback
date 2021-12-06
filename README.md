@@ -11,9 +11,13 @@
 - Nguyễn Thành Trung | Github: https://github.com/midokido28
 
 ## Project Screenshots
-
+### Landing Page
 ![1](screenshots/landing.png)
+
+### Send Feedback Page
 ![1](screenshots/send.png)
+
+### Manager Pages
 ![1](screenshots/manager1.png)
 ![1](screenshots/manager2.png)
 ![1](screenshots/manager3.png)
