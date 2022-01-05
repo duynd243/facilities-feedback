@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="jar-files">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/httpcore-4.4.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/cloudinary-core-1.29.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/cloudinary-http45-1.29.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/httpclient-4.5.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/fluent-hc-4.5.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/sqljdbc4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/httpmime-4.5.13.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/web/jar-files/gson-2.8.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

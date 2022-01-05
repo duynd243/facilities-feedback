@@ -12,7 +12,7 @@ FPTU Facilities Feedback is a website that allows FPT University's lecturers & s
 
 ## Project Screenshots
 ### Landing Page
-![1](screenshots/landing.png)
+![1](screenshots/landing_page.png)
 
 ### Send Feedback Page
 ![1](screenshots/send.png)
